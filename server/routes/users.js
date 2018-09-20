@@ -1,13 +1,14 @@
 const router = require('koa-router')()
 
 router.prefix('/users')
-
-router.get('/', function (ctx, next) {
-  ctx.body = 'this is a users response!'
+// 登录接口
+router.post('/login', async function (ctx) {
+  console.log(ctx.request.body)
+  ctx.body=(ctx.request.body)
 })
-
-router.get('/bar', function (ctx, next) {
-  ctx.body = 'this is a users/bar response'
+// 注册接口,用户名、密码、选择group
+router.post('/register',async (ctx)=>{
+  console.log(ctx.request.body);
 })
 
 module.exports = router
