@@ -1,19 +1,14 @@
-const router = require('koa-router')()
+const controllers = require('../controllers')
 
-router.get('/', async (ctx, next) => {
-  await ctx.render('index', {
-    title: 'Hello Koa 2!'
-  })
+const router = require('koa-router')({
+  prefix: '/weekly'
 })
+//用户类接口
+router.post('/login',controllers.user.login)
+router.post('/register',controllers.user.register)
+router.post('/password/reset',controllers.user.resetpass)
 
-router.get('/string', async (ctx, next) => {
-  ctx.body = 'koa2 string'
-})
-
-router.get('/json', async (ctx, next) => {
-  ctx.body = {
-    title: 'koa2 json'
-  }
-})
+//周报接口
+router.post('/report/get',controllers.report.getReports)
 
 module.exports = router
