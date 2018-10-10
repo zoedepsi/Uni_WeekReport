@@ -7,8 +7,9 @@ const DB = require('../config')
  * @param {} password 
  */
 async function login(ctx) {
-    const username = ctx.request.body.username;
-    const password = ctx.request.body.password;
+    const query = ctx.query;
+    const username = query.username;
+    const password = query.password;
     await DB.select('*').from('user').then(res => {
         const usernames = res.filter(item => item.name == username);
         if (usernames.length == 0) {

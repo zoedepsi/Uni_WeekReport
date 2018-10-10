@@ -5,6 +5,7 @@ const debug = require('debug')
  */
 module.exports = async function (ctx, next) {
     try {
+        ctx.set('Access-Control-Allow-Origin', '*');
         // 调用下一个 middleware
         await next()
 
@@ -12,7 +13,7 @@ module.exports = async function (ctx, next) {
         // 如果直接写入在 body 中，则不作处理
         // 如果写在 ctx.body 为空，则使用 state 作为响应
         ctx.body = ctx.body ? ctx.body : {
-            code: ctx.state.code !== undefined ? ctx.state.code : 0,
+            code: ctx.state.code !== undefined ? ctx.state.code : '00000',
             data: ctx.state.data !== undefined ? ctx.state.data : {},
             msg: ctx.state.msg !== undefined ? ctx.state.msg : ''
 
