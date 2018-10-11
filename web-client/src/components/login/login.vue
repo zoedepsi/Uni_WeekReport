@@ -80,9 +80,10 @@ export default {
             }
           }).then(response => {
             if (response.data.code == "00000") {
-              var userId = response.data.userId;
-              window.sessionStorage.setItem("userId", userId);
-              //根据用户类型进入不同的页面
+              var data=response.data.data[0];
+              window.sessionStorage.setItem('userId',data.id);
+              window.sessionStorage.setItem('trueName',data.truename);
+              window.sessionStorage.setItem('roleId',data.roleId);
               this.$router.push({ path: "/admin-main" });
             } else if (response.data == undefined) {
               this.$message({
@@ -91,7 +92,7 @@ export default {
               });
             } else {
               this.$message({
-                message: response.data.retInfo,
+                message: response.data.msg,
                 type: "error"
               });
             }

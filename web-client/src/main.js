@@ -8,8 +8,6 @@ import VueAxios from 'vue-axios'
 import md5 from 'md5'
 import ElementUI from 'element-ui'
 import Validator from 'vue-validator'
-// import Amazeui from 'amazeui' //需使用cnpm install
-// import dateFormat from 'date-format-utils'
 import 'element-ui/lib/theme-default/index.css'
 import './common/stylus/iconfont.styl';
 import './common/stylus/common.styl'
@@ -19,12 +17,9 @@ Vue.use(ZTree)
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
-// Vue.use(Amazeui)
 Vue.use(VueAxios,axios)
 Vue.use(md5)
 Vue.use(Validator)
-// Vue.use(dateFormat)
-/* eslint-disable no-new */
 new Vue({
   mode:'history',
   el: '#app',
