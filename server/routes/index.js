@@ -10,5 +10,7 @@ router.post('/password/reset',controllers.user.resetpass)
 
 //周报接口
 router.post('/report/get',controllers.report.getReports)
+router.post('/report/add',controllers.report.addReports)
+router.post('/report/update',controllers.report.updateReports)
 
 module.exports = router

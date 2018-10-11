@@ -51,7 +51,7 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="clickCancel">取 消</el-button>
-        <el-button type="primary" @click="submitClass">提 交</el-button>
+        <el-button type="primary" @click="submitReport">提 交</el-button>
       </span>
     </el-dialog>
     <el-dialog title="编辑班级信息" :visible.sync="dialogVisible2" :before-close="clickCancel2">
@@ -99,20 +99,8 @@ export default {
       dialogVisible: false,
       dialogVisible2: false,
       formData: {
-        worked: [
-          {
-            id: 1,
-            content: "",
-            complete: "0"
-          }
-        ],
-        toWork: [
-          {
-            id: 1,
-            content: "",
-            complete: "0"
-          }
-        ]
+        worked: [],
+        toWork: []
       }
     };
   },
@@ -145,6 +133,51 @@ export default {
       } else {
         this.formData.toWork.splice(index, 1);
       }
+    },
+    submitReport() {
+      var that = this;
+
+      for (var i = 0; i < that.formData.worked.length; i++) {
+        if (that.formData.worked[i].content == "") {
+          that.$message({
+            message: "请填写内容或删除空条目后进行提交",
+            type: "warning"
+          });
+          return;
+        }
+      }
+      for (var i = 0; i < that.formData.toWork.length; i++) {
+        if (that.formData.toWork[i].content == "") {
+          that.$message({
+            message: "请填写内容或删除空条目后进行提交",
+            type: "warning"
+          });
+          return;
+        }
+      }
+      that
+        .axios({
+          method: "post",
+          url: rootPath + "/weekly/report/add",
+          params: {
+            userId: window.sessionStorage.getItem("userId"),
+            content: that.formData
+          }
+        })
+        .then(response => {
+          if (response.data.code == "00000") {
+            that.$message({
+              message: "提交成功",
+              type: "success"
+            });
+            that.dialogVisible = false;
+          } else {
+            this.$message({
+              message: response.data.msg,
+              type: "error"
+            });
+          }
+        });
     },
     queryReport() {
       var that = this;
@@ -195,6 +228,18 @@ export default {
 
     addClass() {
       this.dialogVisible = true;
+      this.formData.worked.length=0;
+      this.formData.toWork.length=0;
+      this.formData.worked.push({
+        id: 1,
+        content: "",
+        complete: "0"
+      });
+      this.formData.toWork.push({
+        id: 1,
+        content: "",
+        complete: "0"
+      });
     },
 
     formatDate(date) {
@@ -295,5 +340,4 @@ export default {
   width: 80px;
   margin: 0 10px;
 }
-
 </style>

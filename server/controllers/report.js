@@ -22,8 +22,8 @@ async function getReports(ctx) {
  * @param {*} content
  */
 async function addReports(ctx) {
-    const userId = ctx.request.body.userId;
-    const content = ctx.request.body.content;
+    const userId = ctx.query.userId;
+    const content = ctx.query.content;
     await DB.insert({
         'content': content,
         'userId': userId
@@ -46,5 +46,7 @@ async function updateReports(ctx) {
 }
 
 module.exports = {
-    getReports
+    getReports,
+    addReports,
+    updateReports
 }
