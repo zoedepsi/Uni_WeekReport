@@ -4,9 +4,7 @@
       <div class=login_container>
         <el-row class="header_row">
           <el-col>
-            <a href="#">
-               <span class="index_logo"></span>
-            </a>
+            <h1 class="htitle">uhome周报管理系统</h1>
           </el-col>
         </el-row>
         <el-row class="login_panel_row vertical">
@@ -111,8 +109,8 @@ export default {
 }
 
 .btnpuprle {
-  background-color: #86004B;
-  border-color: #86004B;
+  background-color: #005CAF;
+  border-color: #005CAF;
 }
 
 .el-row.content {
@@ -195,5 +193,10 @@ export default {
 
 .formBtnGroup {
   width: 100%;
+}
+.htitle{
+  font-size 50px;
+  text-align center;
+  margin-top 80px;
 }
 </style>

@@ -8,9 +8,9 @@ const DB = require('../config')
  */
 async function getReports(ctx) {
 
-    const userId = ctx.request.body.userId;
-    const startTime = ctx.request.body.startTime ? ctx.request.body.startTime : '0000-00-00';
-    const endTime = (ctx.request.body.endTime ? ctx.request.body.endTime : '9999-99-99') + ' ' + '24:00:00';
+    const userId = ctx.query.userId;
+    const startTime = ctx.query.startTime ? ctx.query.startTime : '0000-00-00';
+    const endTime = (ctx.query.endTime ? ctx.query.endTime : '9999-99-99') + ' ' + '24:00:00';
     await DB.select('*').from('report').where('userId', userId).andWhere('createTime', '>=', startTime).andWhere('createTime', '<=', endTime).then(res => {
         ctx.state.data = res;
     })

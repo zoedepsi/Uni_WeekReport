@@ -1,11 +1,10 @@
 <template>
   <div class="content">
     <div class="header-wrapper">
-      <div class="logo">
-      </div>
+
       <div class="merinfo">
         <img src="../../assets/avatar.jpg" width="40" height="40" alt="">
-        <p>admin</p>
+        <p>uhome</p>
       </div>
       <div class="close">
         <router-link to="/login">退出</router-link>

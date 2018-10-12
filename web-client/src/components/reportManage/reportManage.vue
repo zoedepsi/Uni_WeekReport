@@ -2,7 +2,7 @@
   <div class="page-wrapper">
     <el-row>
       <el-col :span="10">
-        <div class="page-title" id="vip-title">周报填写</div>
+        <div class="page-title" id="vip-title">周报管理</div>
       </el-col>
       <el-col :span="14">
         <el-button type="primary" style="float:right;margin-right:10px" @click="addClass">填写周报</el-button>
@@ -11,9 +11,34 @@
       </el-col>
     </el-row>
     <div class="bills-wrapper">
-      <el-table data="" stripe style="width: 100%">
-        <el-table-column prop="className" label="班级名称" width='100'></el-table-column>
-
+      <el-table :data="tableData" stripe style="width: 100%">
+        <el-table-column prop="id" label="ID" width='100'></el-table-column>
+        <el-table-column label="周报内容">
+          <template slot-scope="scope">
+            <p style="color:#888;font-size:12px;">本周工作内容</p>
+            <ul>
+              <li v-for="(item,index) in scope.row.content.worked" :key="index" style="display:flex;justify-content:space-between;padding:0 20px;">
+                <span>{{index+1}}. {{item.content}}</span>
+                <span>完成度：{{item.complete}}%</span>
+              </li>
+            </ul>
+            <p  style="color:#888;font-size:12px;">下周工作计划</p>
+            <ul>
+              <li v-for="(item,index) in scope.row.content.toWork" :key="index"  style="display:flex;justify-content:space-between;padding:0 20px;">
+                <span>{{index+1}}. {{item.content}}</span>
+                <span>完成度：{{item.complete}}%</span>
+              </li>
+            </ul>
+            <!-- <el-button type="primary" size="mini" @click="routerTo(scope.$index, scope.row)">查看</el-button> -->
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" width='200'></el-table-column>
+        <el-table-column prop="updateTime" label="上次更新时间" width='200'></el-table-column>
+        <el-table-column label="操作" width='100'>
+          <template slot-scope="scope">
+          <el-button type="primary">编辑</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
     <el-dialog title="填写周报" :visible.sync="dialogVisible" :before-close="clickCancel">
@@ -30,11 +55,11 @@
             <el-option label="80%" value="80"></el-option>
             <el-option label="100%" value="100"></el-option>
           </el-select>
-          <el-button class="delBtn" type="danger" @click="delItem(index,0)"  :disabled="formData.worked.length==1">x</el-button>
+          <el-button class="delBtn" type="danger" @click="delItem(index,0)" :disabled="formData.worked.length==1">x</el-button>
           <el-button class="addBtn" type="primary" @click="addItem(0)" v-if="formData.worked.length-1==index">+</el-button>
         </div>
         <p class="repTitle">下周工作计划</p>
-                <div class="report" :key="index" v-for="(item,index) in formData.toWork">
+        <div class="report" :key="index" v-for="(item,index) in formData.toWork">
           <!-- <span>{{item.id}}</span> -->
           <el-input class="reportInput" v-model="item.content" placeholder="周报内容"></el-input>
           <el-select class="reportSel" v-model="item.complete" placeholder="完成度">
@@ -45,8 +70,8 @@
             <el-option label="80%" value="80"></el-option>
             <el-option label="100%" value="100"></el-option>
           </el-select>
-          <el-button class="delBtn" type="danger"  @click="delItem(index,1)" :disabled="formData.toWork.length==1">x</el-button>
-          <el-button class="addBtn" type="primary" @click="addItem(1)"  v-if="formData.toWork.length-1==index">+</el-button>
+          <el-button class="delBtn" type="danger" @click="delItem(index,1)" :disabled="formData.toWork.length==1">x</el-button>
+          <el-button class="addBtn" type="primary" @click="addItem(1)" v-if="formData.toWork.length-1==index">+</el-button>
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -79,7 +104,7 @@
         </el-form-item>
       </el-form><span slot="footer" class="dialog-footer">
         <el-button @click="clickCancel2">取 消</el-button>
-        <el-button type="primary" @click="submitEditClass">提 交</el-button>
+        <el-button type="primary">提 交</el-button>
       </span>
     </el-dialog>
   </div>
@@ -93,7 +118,7 @@ export default {
       pickOption: {
         firstDayOfWeek: 1
       },
-
+      tableData: [],
       dateFormat: "yyyy-MM-dd",
       dateValue: "",
       dialogVisible: false,
@@ -228,8 +253,8 @@ export default {
 
     addClass() {
       this.dialogVisible = true;
-      this.formData.worked.length=0;
-      this.formData.toWork.length=0;
+      this.formData.worked.length = 0;
+      this.formData.toWork.length = 0;
       this.formData.worked.push({
         id: 1,
         content: "",
@@ -248,6 +273,29 @@ export default {
 
     refreshData() {
       var that = this;
+      var userId = window.sessionStorage.getItem("userId");
+      that
+        .axios({
+          method: "post",
+          url: rootPath + "/weekly/report/get",
+          params: {
+            userId: window.sessionStorage.getItem("userId")
+          }
+        })
+        .then(response => {
+          if (response.data.data) {
+            var data = response.data.data;
+            for (var i = 0; i < data.length; i++) {
+              data[i].content = JSON.parse(data[i].content);
+            }
+            that.tableData = data;
+          } else {
+            this.$message({
+              message: response.data.msg,
+              type: "error"
+            });
+          }
+        });
     }
   }
 };
@@ -319,6 +367,7 @@ export default {
   font-weight: bold;
   margin: 10px 0;
 }
+
 .report {
   display: flex;
   flex-direction: row;
@@ -326,6 +375,7 @@ export default {
   justify-content: flex-start;
   margin: 5px 0;
 }
+
 .report span {
   display: block;
   width: 30px;
@@ -333,9 +383,11 @@ export default {
   text-align: center;
   margin: 0 5px;
 }
+
 .reportInput {
   width: 70%;
 }
+
 .reportSel {
   width: 80px;
   margin: 0 10px;
