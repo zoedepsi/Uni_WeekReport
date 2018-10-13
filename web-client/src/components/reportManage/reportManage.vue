@@ -5,26 +5,26 @@
         <div class="page-title" id="vip-title">周报管理</div>
       </el-col>
       <el-col :span="14">
-        <el-button type="primary" style="float:right;margin-right:10px" @click="addClass">填写周报</el-button>
+        <el-button type="primary" style="float:right;margin-right:10px" @click="addClass" :disabled="tableData.length>0?true:false">填写周报</el-button>
         <el-date-picker style="float:right;margin-right:10px" v-model="dateValue" type="week" format="yyyy 第 WW 周"
           :picker-options="pickOption" :value-format="dateFormat" placeholder="选择周" @change="queryReport"></el-date-picker>
       </el-col>
     </el-row>
     <div class="bills-wrapper">
       <el-table :data="tableData" stripe style="width: 100%">
-        <el-table-column prop="id" label="ID" width='100'></el-table-column>
+        <!-- <el-table-column prop="id" label="ID" width='100'></el-table-column> -->
         <el-table-column label="周报内容">
           <template slot-scope="scope">
             <p style="color:#888;font-size:12px;">本周工作内容</p>
             <ul>
-              <li v-for="(item,index) in scope.row.content.worked" :key="index" style="display:flex;justify-content:space-between;padding:0 20px;">
+              <li v-for="(item,index) in scope.row.content.worked" :key="index" style="display:flex;justify-content:space-between;padding:0 30px;margin:5px 0;">
                 <span>{{index+1}}. {{item.content}}</span>
                 <span>完成度：{{item.complete}}%</span>
               </li>
             </ul>
             <p  style="color:#888;font-size:12px;">下周工作计划</p>
             <ul>
-              <li v-for="(item,index) in scope.row.content.toWork" :key="index"  style="display:flex;justify-content:space-between;padding:0 20px;">
+              <li v-for="(item,index) in scope.row.content.toWork" :key="index"  style="display:flex;justify-content:space-between;padding:0 30px;margin:5px 0;">
                 <span>{{index+1}}. {{item.content}}</span>
                 <span>完成度：{{item.complete}}%</span>
               </li>
@@ -32,8 +32,16 @@
             <!-- <el-button type="primary" size="mini" @click="routerTo(scope.$index, scope.row)">查看</el-button> -->
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width='200'></el-table-column>
-        <el-table-column prop="updateTime" label="上次更新时间" width='200'></el-table-column>
+        <el-table-column  label="创建时间" width='200'>
+          <template slot-scope="scope">
+            <span>{{formatDate(scope.row.createTime)}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="上次更新时间" width='200'>
+                    <template slot-scope="scope">
+            <span>{{formatDate(scope.row.updateTime)}}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width='100'>
           <template slot-scope="scope">
           <el-button type="primary">编辑</el-button>
@@ -135,6 +143,33 @@ export default {
   },
 
   methods: {
+    formatDate: function(date) {
+      return (
+        new Date(date).toLocaleDateString() +
+        " " +
+        new Date(date).toTimeString().slice(0, 8)
+      );
+    },
+    getWeekFirstDay(day) {
+      var date = new Date(day);
+      date.setDate(date.getDate() + 1 - date.getDay());
+      var month=date.getMonth()+1;
+      month=month<10?'0'+month:month;
+      var day=date.getDate()<10?'0'+date.getDate():date.getDate();
+      return (
+        date.getFullYear() + "-" + month + "-" + day
+      );
+    },
+    getWeekLastDay(day) {
+      var date = new Date(day);
+      date.setDate(date.getDate() + 7 - date.getDay());
+      var month=date.getMonth()+1;
+      month=month<10?'0'+month:month;
+      var day=date.getDate()<10?'0'+date.getDate():date.getDate();
+      return (
+        date.getFullYear() + "-" + month + "-" + day
+      );
+    },
     addItem(type) {
       if (type == 0) {
         var lastItem = this.formData.worked[this.formData.worked.length - 1];
@@ -205,8 +240,10 @@ export default {
         });
     },
     queryReport() {
-      var that = this;
-      console.log(this.dateValue);
+      var startDay = this.getWeekFirstDay(this.dateValue);
+      var endDay = this.getWeekLastDay(this.dateValue);
+
+      this.refreshData(startDay, endDay);
     },
     editClass(id) {
       var that = this;
@@ -267,11 +304,7 @@ export default {
       });
     },
 
-    formatDate(date) {
-      return new Date(date).toLocaleString();
-    },
-
-    refreshData() {
+    refreshData(startDay, endDay) {
       var that = this;
       var userId = window.sessionStorage.getItem("userId");
       that
@@ -279,7 +312,9 @@ export default {
           method: "post",
           url: rootPath + "/weekly/report/get",
           params: {
-            userId: window.sessionStorage.getItem("userId")
+            userId: window.sessionStorage.getItem("userId"),
+            startTime: startDay,
+            endTime: endDay
           }
         })
         .then(response => {
