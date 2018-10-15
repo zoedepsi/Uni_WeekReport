@@ -70,10 +70,22 @@ async function resetpass(ctx){
         ctx.state.data=res;
     })
 }
+/**
+ * 通过groupId获取该组内所有用户
+ *
+ * @param {*} ctx
+ */
+async function getusersbygroupid(ctx){
+    const groupId=ctx.query.groupId;
+    await DB.select('id','truename').from('user').where('groupId', groupId).then(async res => {
+        ctx.state.data=res;
+    })
+}
 
 
 module.exports = {
     login,
     register,
-    resetpass
+    resetpass,
+    getusersbygroupid
 }

@@ -1,5 +1,22 @@
 const DB = require('../config')
 
+function getWeekFirstDay(day) {
+    var date = new Date(day);
+    date.setDate(date.getDate() + 1 - date.getDay());
+    var month = date.getMonth() + 1;
+    month = month < 10 ? "0" + month : month;
+    var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+    return date.getFullYear() + "-" + month + "-" + day;
+}
+
+function getWeekLastDay(day) {
+    var date = new Date(day);
+    date.setDate(date.getDate() + 7 - date.getDay());
+    var month = date.getMonth() + 1;
+    month = month < 10 ? "0" + month : month;
+    var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+    return date.getFullYear() + "-" + month + "-" + day;
+}
 /**
  *获取所有周报数据
  *
@@ -15,6 +32,43 @@ async function getReports(ctx) {
         ctx.state.data = res;
     })
 }
+
+async function getReportsByGroup(ctx) {
+    var date = new Date();
+    var firstDay = getWeekFirstDay(date);
+    var lastDay = getWeekLastDay(date);
+    const groupId = ctx.query.groupId;
+    const startTime = ctx.query.startTime ? ctx.query.startTime : firstDay;
+    const endTime = (ctx.query.endTime ? ctx.query.endTime : lastDay) + ' ' + '24:00:00';
+    const userId = ctx.query.userId;
+    //通过groupId遍历userID
+    var data = {};
+    if (!userId||userId=='99999') {
+        await DB.select('id', 'truename').from('user').where('groupid', groupId).then(async res => {
+            var userArr = res;
+            for (var i = 0; i < userArr.length; i++) {
+                await DB.select('*').from('report').where('userId', userArr[i].id).andWhere('createTime', '>=', startTime).andWhere('createTime', '<=', endTime).then(res => {
+                    if (res.length > 0) {
+                        data[userArr[i].truename] = res;
+                    }
+                })
+            }
+        })
+    } else {
+        await DB.select('truename').from('user').where('id', userId).then(async res => {
+            var truename = res[0].truename;
+            await DB.select('*').from('report').where('userId', userId).andWhere('createTime', '>=', startTime).andWhere('createTime', '<=', endTime).then(res => {
+                data[truename] = res;
+            })
+        })
+    }
+
+    ctx.state.data = data;
+
+}
+
+
+
 /**
  *添加周报接口
  * 
@@ -48,5 +102,6 @@ async function updateReports(ctx) {
 module.exports = {
     getReports,
     addReports,
-    updateReports
+    updateReports,
+    getReportsByGroup
 }

@@ -82,6 +82,7 @@ export default {
               window.sessionStorage.setItem('userId',data.id);
               window.sessionStorage.setItem('trueName',data.truename);
               window.sessionStorage.setItem('roleId',data.roleId);
+              window.sessionStorage.setItem('groupId',data.groupId);
               this.$router.push({ path: "/admin-main" });
             } else if (response.data == undefined) {
               this.$message({

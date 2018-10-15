@@ -19,7 +19,7 @@
             <!-- <el-menu-item v-for="item in menuItems" :index="'v-'+item.permissionid" :key="item.permissionid" >{{ item.permissionname }}</el-menu-item> -->
             <el-menu-item index="v-index">我的工作台</el-menu-item>
             <el-menu-item index='v-reportManage'>周报填写</el-menu-item>
-            <el-menu-item index='v-reportManage'>周报查询</el-menu-item>
+            <el-menu-item index='v-reportQuery'>周报查询</el-menu-item>
           </el-menu>
         </el-col>
       </div>
@@ -35,7 +35,8 @@
 <script type='text/ecmascript-6'>
 import index from "../index/admin-index.vue";
 import { rootPath } from "../../config/apiConfig";
-import reportManage from '../reportManage/reportManage.vue'
+import reportManage from '../reportManage/reportManage.vue';
+import reportQuery from '../reportQuery/reportQuery.vue';
 
 export default {
   data() {
@@ -63,6 +64,7 @@ export default {
   components: {
     "v-index": index,
     "v-reportManage": reportManage,
+    "v-reportQuery":reportQuery
   }
 };
 </script>
