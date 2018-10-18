@@ -30,7 +30,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/weekly': {
-        target: 'http://127.0.0.1:3000/weekly',
+        target: 'http://10.159.174.194:3000/weekly',
         changeOrigin: true,
         pathRewrite: {
           '^/weekly': '/weekly'
