@@ -5,7 +5,7 @@
         <div class="page-title" id="vip-title">周报管理</div>
       </el-col>
       <el-col :span="14">
-        <el-button type="primary" style="float:right;margin-right:10px" @click="addReport" :disabled="allowAdd">填写周报</el-button>
+        <el-button type="primary" style="float:right;margin-right:10px" @click="addReport" :disabled="noAdd">填写周报</el-button>
         <el-date-picker style="float:right;margin-right:10px" v-model="dateValue" type="week" format="yyyy 第 WW 周"
           :picker-options="pickOption" :value-format="dateFormat" placeholder="选择周" @change="queryReport"></el-date-picker>
       </el-col>
@@ -146,14 +146,13 @@ export default {
       dialogVisible: false,
       dialogVisible2: false,
       formData: {
-        isEditMode: false,
         worked: [],
         toWork: []
       },
-      editId: ""
+      editId: "",
+      noAdd: false
     };
   },
-
   mounted() {
     this.refreshData();
   },
@@ -165,14 +164,6 @@ export default {
         " " +
         new Date(date).toTimeString().slice(0, 8)
       );
-    },
-    allowAdd(){
-      var createTime=this.tableData[0].createTime;
-      if(createTime<this.getWeekLastDay()&&createTime>this.getWeekFirstDay){
-        return true;
-      }else{
-        return false;
-      }
     },
     getWeekFirstDay(day) {
       var date = new Date(day);
@@ -206,7 +197,6 @@ export default {
           if (response.data.code == "00000") {
             var data = response.data.data[0];
             that.formData = JSON.parse(data.content);
-            that.formData.isEditMode = true;
           } else {
             this.$message({
               message: response.data.msg,
@@ -217,16 +207,12 @@ export default {
     },
     addItem(type) {
       if (type == 0) {
-        var lastItem = this.formData.worked[this.formData.worked.length - 1];
         this.formData.worked.push({
-          id: lastItem.id + 1,
           content: "",
           complete: "0"
         });
       } else {
-        var lastItem = this.formData.toWork[this.formData.toWork.length - 1];
         this.formData.toWork.push({
-          id: lastItem.id + 1,
           content: "",
           complete: "0"
         });
@@ -333,7 +319,6 @@ export default {
     queryReport() {
       var startDay = this.getWeekFirstDay(this.dateValue);
       var endDay = this.getWeekLastDay(this.dateValue);
-
       this.refreshData(startDay, endDay);
     },
 
@@ -348,12 +333,10 @@ export default {
     addReport() {
       var that = this;
       this.dialogVisible = true;
-      that.formData.isEditMode = false;
       this.formData.worked.length = 0;
       this.formData.toWork.length = 0;
       this.getLastWeekReport();
       this.formData.toWork.push({
-        id: 1,
         content: "",
         complete: "0"
       });
@@ -372,11 +355,17 @@ export default {
         .then(response => {
           if (response.data.data) {
             var data = response.data.data[0];
-            var content = JSON.parse(data.content);
-            for (var i = 0; i < content.toWork.length; i++) {
-              content.toWork[i].disableEdit = true;
+            if (data) {
+              var content = JSON.parse(data.content);
+              for (var i = 0; i < content.toWork.length; i++) {
+                content.toWork[i].disableEdit = true;
+              }
+              that.formData.worked = content.toWork;
             }
-            that.formData.worked = content.toWork;
+            that.formData.worked.push({
+              content: "",
+              complete: "0"
+            });
           } else {
             this.$message({
               message: response.data.msg,
@@ -405,6 +394,33 @@ export default {
               data[i].content = JSON.parse(data[i].content);
             }
             that.tableData = data;
+
+            if (that.tableData.length > 0) {
+              var createTime = that.tableData[0].createTime;
+              if (
+                createTime <= that.getWeekLastDay(new Date()) &&
+                createTime > that.getWeekFirstDay(new Date())
+              ) {
+                that.noAdd = true;
+                return;
+              } else {
+                that.noAdd = false;
+                return;
+              }
+            } else if (that.tableData.length == 0 && that.dateValue == "") {
+              that.noAdd = false;
+              return;
+            } else if (
+              that.dateValue != "" &&
+              that.dateValue <= new Date(this.getWeekLastDay(new Date())) &&
+              that.dateValue > new Date(this.getWeekFirstDay(new Date()))
+            ) {
+              that.noAdd = false;
+              return;
+            } else {
+              that.noAdd = true;
+              return;
+            }
           } else {
             this.$message({
               message: response.data.msg,

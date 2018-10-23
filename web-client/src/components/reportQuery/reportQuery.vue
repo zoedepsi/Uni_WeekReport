@@ -155,9 +155,31 @@ export default {
   },
 
   methods: {
+    getWeekFirstDay(day) {
+      var date = new Date(day);
+      date.setDate(date.getDate() + 1 - date.getDay());
+      var month = date.getMonth() + 1;
+      month = month < 10 ? "0" + month : month;
+      var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+      return date.getFullYear() + "-" + month + "-" + day;
+    },
+    getWeekLastDay(day) {
+      var date = new Date(day);
+      date.setDate(date.getDate() + 7 - date.getDay());
+      var month = date.getMonth() + 1;
+      month = month < 10 ? "0" + month : month;
+      var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+      return date.getFullYear() + "-" + month + "-" + day;
+    },
     getreportbyuser(val) {
       var that = this;
-    this.refreshData(undefined,undefined, val);
+      if (that.dateValue) {
+        var startDay = this.getWeekFirstDay(that.dateValue);
+        var endDay = this.getWeekLastDay(that.dateValue);
+        this.refreshData(startDay, endDay, val);
+      } else {
+        this.refreshData(undefined, undefined, val);
+      }
     },
     getuserbygroup() {
       var that = this;
@@ -287,8 +309,8 @@ export default {
     queryReport() {
       var startDay = this.getWeekFirstDay(this.dateValue);
       var endDay = this.getWeekLastDay(this.dateValue);
-
-      this.refreshData(startDay, endDay);
+      var userId = this.userValue;
+      this.refreshData(startDay, endDay, userId);
     },
     editClass(id) {
       var that = this;
@@ -349,7 +371,7 @@ export default {
       });
     },
 
-    refreshData(startDay, endDay,userId) {
+    refreshData(startDay, endDay, userId) {
       var that = this;
       var groupId = window.sessionStorage.getItem("groupId");
       that
@@ -360,7 +382,7 @@ export default {
             groupId: groupId,
             startTime: startDay,
             endTime: endDay,
-            userId:userId
+            userId: userId
           }
         })
         .then(response => {
