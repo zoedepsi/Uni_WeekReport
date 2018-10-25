@@ -12,8 +12,8 @@ import 'element-ui/lib/theme-default/index.css'
 import './common/stylus/iconfont.styl';
 import './common/stylus/common.styl'
 import { ZTree } from 'vue2-lazy-tree'
-Vue.use(ZTree)
 
+Vue.use(ZTree)
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)

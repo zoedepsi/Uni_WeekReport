@@ -18,8 +18,16 @@
           <el-menu default-active="v-index" class="" theme="dark" @select="changeTab" style="margin-bottom: 100px;">
             <!-- <el-menu-item v-for="item in menuItems" :index="'v-'+item.permissionid" :key="item.permissionid" >{{ item.permissionname }}</el-menu-item> -->
             <el-menu-item index="v-index">我的工作台</el-menu-item>
-            <el-menu-item index='v-reportManage'>周报填写</el-menu-item>
-            <el-menu-item index='v-reportQuery'>周报查询</el-menu-item>
+            <el-submenu  index='2'>
+              <template slot="title">周报管理</template>
+              <el-menu-item index='v-reportManage'>周报填写</el-menu-item>
+              <el-menu-item index='v-reportQuery'>周报查询</el-menu-item>
+            </el-submenu>
+            <el-submenu  index='3'>
+              <template slot="title">会议纪要</template>
+              <el-menu-item index='v-meetRecord'>新建纪要</el-menu-item>
+              <el-menu-item index='v-meetQuery'>纪要查询</el-menu-item>
+            </el-submenu>
           </el-menu>
         </el-col>
       </div>
@@ -35,13 +43,14 @@
 <script type='text/ecmascript-6'>
 import index from "../index/admin-index.vue";
 import { rootPath } from "../../config/apiConfig";
-import reportManage from '../reportManage/reportManage.vue';
-import reportQuery from '../reportQuery/reportQuery.vue';
-
+import reportManage from "../reportManage/reportManage.vue";
+import reportQuery from "../reportQuery/reportQuery.vue";
+import meetRecord from "../meetRecord/meetRecord.vue";
+import meetQuery from "../meetQuery/meetQuery.vue"
 export default {
   data() {
     return {
-      userData:{},
+      userData: {},
       menuItems: [],
       currentView: "v-index"
     };
@@ -55,16 +64,17 @@ export default {
     },
     getUserMenu() {
       var roleId = window.sessionStorage.getItem("role");
-
     }
   },
-  created(){
-    this.userData.trueName=window.sessionStorage.getItem('trueName');
+  created() {
+    this.userData.trueName = window.sessionStorage.getItem("trueName");
   },
   components: {
     "v-index": index,
     "v-reportManage": reportManage,
-    "v-reportQuery":reportQuery
+    "v-reportQuery": reportQuery,
+    "v-meetRecord": meetRecord,
+    "v-meetQuery":meetQuery
   }
 };
 </script>

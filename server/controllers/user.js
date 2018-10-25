@@ -62,12 +62,12 @@ async function register(ctx) {
  * 重置密码接口（仅管理员调用）
  * @param {userId} id 
  */
-async function resetpass(ctx){
-    const id=ctx.request.body.id;
+async function resetpass(ctx) {
+    const id = ctx.request.body.id;
     await DB('user').update({
-        "password":'123456'
-    }).where('id',id).then(res => {
-        ctx.state.data=res;
+        "password": '123456'
+    }).where('id', id).then(res => {
+        ctx.state.data = res;
     })
 }
 /**
@@ -75,10 +75,18 @@ async function resetpass(ctx){
  *
  * @param {*} ctx
  */
-async function getusersbygroupid(ctx){
-    const groupId=ctx.query.groupId;
-    await DB.select('id','truename').from('user').where('groupId', groupId).then(async res => {
-        ctx.state.data=res;
+async function getusersbygroupid(ctx) {
+    const groupId = ctx.query.groupId;
+    await DB.select('id', 'truename').from('user').where('groupId', groupId).then(res => {
+        ctx.state.data = res;
+    })
+}
+
+async function getuseridbyname(ctx) {
+    const truename =  ctx.query.truename;
+    const querys = '%' + truename + '%';
+    await DB.select('truename').from('user').where('truename', 'like', querys).then(res => {
+        ctx.state.data = res;
     })
 }
 
@@ -87,5 +95,6 @@ module.exports = {
     login,
     register,
     resetpass,
-    getusersbygroupid
+    getusersbygroupid,
+    getuseridbyname
 }

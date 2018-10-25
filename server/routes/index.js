@@ -8,7 +8,7 @@ router.post('/login',controllers.user.login)
 router.post('/register',controllers.user.register)
 router.post('/password/reset',controllers.user.resetpass)
 router.post('/user/getbygroup',controllers.user.getusersbygroupid)
-
+router.post('/user/getuseridbyname',controllers.user.getuseridbyname)
 
 //周报接口
 router.post('/report/get',controllers.report.getReports)
@@ -18,4 +18,7 @@ router.post('/report/update',controllers.report.updateReports)
 router.post('/report/getbygroup',controllers.report.getReportsByGroup)
 router.post('/report/getLastWeekReport',controllers.report.getLastWeekReport)
 
+//会议纪要接口
+router.post('/meet/add', controllers.meet.add)
+router.post('/meet/query',controllers.meet.query)
 module.exports = router
