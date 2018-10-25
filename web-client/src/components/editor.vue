@@ -39,8 +39,8 @@ export default {
     const setting = {
       selector: "#" + _this.id,
       language: "zh_CN",
-      language_url: "/static/langs/zh_CN.js",
-      skin_url: "/static/skins/lightgray",
+      language_url: "static/langs/zh_CN.js",
+      skin_url: "static/skins/lightgray",
       init_instance_callback: function(editor) {
         EDITOR = editor;
         console.log("Editor: " + editor.id + " is now initialized.");
