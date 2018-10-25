@@ -187,7 +187,7 @@ export default {
       that
         .axios({
           method: "post",
-          url: rootPath + "/weekly/user/getbygroup",
+          url: rootPath + "/weeklyserver/user/getbygroup",
           params: {
             groupId: groupId
           }
@@ -285,7 +285,7 @@ export default {
       that
         .axios({
           method: "post",
-          url: rootPath + "/weekly/report/add",
+          url: rootPath + "/weeklyserver/report/add",
           params: {
             userId: window.sessionStorage.getItem("userId"),
             content: that.formData
@@ -377,7 +377,7 @@ export default {
       that
         .axios({
           method: "post",
-          url: rootPath + "/weekly/report/getbygroup",
+          url: rootPath + "/weeklyserver/report/getbygroup",
           params: {
             groupId: groupId,
             startTime: startDay,

@@ -7,7 +7,7 @@ module.exports = {
     index: path.resolve(__dirname, '../dist/index.html'),
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    assetsPublicPath: './',
     proxyTable: {},
     productionSourceMap: true,
     // Gzip off by default as many popular static hosts such as
@@ -29,11 +29,11 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/weekly': {
-        target: 'http://10.159.174.194:3000/weekly',
+      '/weeklyserver': {
+        target: 'http://10.159.174.194:3000/weeklyserver',
         changeOrigin: true,
         pathRewrite: {
-          '^/weekly': '/weekly'
+          '^/weeklyserver': '/weeklyserver'
         }
       }
     },

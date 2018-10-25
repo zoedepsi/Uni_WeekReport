@@ -96,7 +96,7 @@
         <p class="repTitle">本周工作总结</p>
         <div class="report" :key="index" v-for="(item,index) in formData.worked">
           <!-- <span>{{item.id}}</span> -->
-          <el-input class="reportInput" v-model="item.content" placeholder="周报内容"></el-input>
+          <el-input class="reportInput" v-model="item.content" placeholder="周报内容"  :disabled="item.disableEdit"></el-input>
           <el-select class="reportSel" v-model="item.complete" placeholder="完成度">
             <el-option label="0%" value="0"></el-option>
             <el-option label="20%" value="20"></el-option>
@@ -105,7 +105,7 @@
             <el-option label="80%" value="80"></el-option>
             <el-option label="100%" value="100"></el-option>
           </el-select>
-          <el-button class="delBtn" type="danger" @click="delItem(index,0)" :disabled="formData.worked.length==1">x</el-button>
+          <el-button class="delBtn" type="danger" @click="delItem(index,0)" :disabled="formData.worked.length==1 || item.disableEdit">x</el-button>
           <el-button class="addBtn" type="primary" @click="addItem(0)" v-if="formData.worked.length-1==index">+</el-button>
         </div>
         <p class="repTitle">下周工作计划</p>
@@ -188,7 +188,7 @@ export default {
       that
         .axios({
           method: "post",
-          url: rootPath + "/weekly/report/getbyid",
+          url: rootPath + "/weeklyserver/report/getbyid",
           params: {
             id: id
           }
@@ -249,7 +249,7 @@ export default {
       that
         .axios({
           method: "post",
-          url: rootPath + "/weekly/report/add",
+          url: rootPath + "/weeklyserver/report/add",
           params: {
             userId: window.sessionStorage.getItem("userId"),
             content: that.formData
@@ -294,7 +294,7 @@ export default {
       that
         .axios({
           method: "post",
-          url: rootPath + "/weekly/report/update",
+          url: rootPath + "/weeklyserver/report/update",
           params: {
             id: that.editId,
             content: that.formData
@@ -347,7 +347,7 @@ export default {
       that
         .axios({
           method: "post",
-          url: rootPath + "/weekly/report/getLastWeekReport",
+          url: rootPath + "/weeklyserver/report/getLastWeekReport",
           params: {
             userId: window.sessionStorage.getItem("userId")
           }
@@ -380,7 +380,7 @@ export default {
       that
         .axios({
           method: "post",
-          url: rootPath + "/weekly/report/get",
+          url: rootPath + "/weeklyserver/report/get",
           params: {
             userId: window.sessionStorage.getItem("userId"),
             startTime: startDay,

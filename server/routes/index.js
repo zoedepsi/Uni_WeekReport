@@ -1,7 +1,7 @@
 const controllers = require('../controllers')
 
 const router = require('koa-router')({
-  prefix: '/weekly'
+  prefix: '/weeklyserver'
 })
 //用户类接口
 router.post('/login',controllers.user.login)

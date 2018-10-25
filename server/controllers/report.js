@@ -26,6 +26,15 @@ function getLastWeekFirstDay(day) {
     var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
     return date.getFullYear() + "-" + month + "-" + day;
 }
+
+function getLastWeekLastDay(day) {
+    var date = new Date(day);
+    date.setDate(date.getDate() - date.getDay());
+    var month = date.getMonth() + 1;
+    month = month < 10 ? "0" + month : month;
+    var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+    return date.getFullYear() + "-" + month + "-" + day;
+}
 /**
  *获取所有周报数据
  *
@@ -63,9 +72,12 @@ async function getReportsByGroup(ctx) {
     var date = new Date();
     var firstDay = getWeekFirstDay(date);
     var lastDay = getWeekLastDay(date);
+
     const groupId = ctx.query.groupId;
     const startTime = ctx.query.startTime ? ctx.query.startTime : firstDay;
     const endTime = (ctx.query.endTime ? ctx.query.endTime : lastDay) + ' ' + '24:00:00';
+    const lastWeekfirstDay = getLastWeekFirstDay(new Date(startTime));
+    const lastWeeklastDay = getLastWeekLastDay(new Date(startTime));
     const userId = ctx.query.userId;
     //通过groupId遍历userID
     var data = {};

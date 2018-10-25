@@ -71,7 +71,7 @@ export default {
           this.logining = true;
           this.axios({
             method: "post",
-            url: rootPath + "/weekly/login",
+            url: rootPath + "/weeklyserver/login",
             params: {
               username: this.loginform.username,
               password: this.loginform.password
