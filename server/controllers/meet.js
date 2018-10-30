@@ -1,11 +1,5 @@
 const DB = require('../config')
 
-/**
- *登录接口
- *
- * @param {} username
- * @param {} password 
- */
 async function add(ctx) {
     const query = JSON.parse(ctx.query.formData);
     const title = query.title,
@@ -35,11 +29,15 @@ async function query(ctx) {
     const query = ctx.query;
     const id = query.id;
     if (id) {
-        await DB.select('*').from('meetrecord').where('id', id).then(res => {
+        await DB.select('*').from('meetrecord').join('enums', function () {
+            this.on('meetrecord.meettype', 'enums.value');
+        }).where('meetrecord.id',id).then(res => {
             ctx.state.data = res;
         })
     } else {
-        await DB.select('*').from('meetrecord').then(res => {
+        await DB.select('*').from('meetrecord').join('enums', function () {
+            this.on('meetrecord.meettype', 'enums.value');
+        }).where({'enums.companyid': '1'},{'enums.type':'meettype'}).then(res => {
             ctx.state.data = res;
         })
     }

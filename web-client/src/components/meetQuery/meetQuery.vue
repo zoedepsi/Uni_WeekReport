@@ -12,6 +12,7 @@
       <el-table :data="tableData" stripe style="width: 100%;">
         <el-table-column prop="id" label="ID" width="80"></el-table-column>
         <el-table-column prop="title" label="会议主题"></el-table-column>
+        <el-table-column prop="label" label="会议类别" width="100"></el-table-column>
         <el-table-column prop="hostmemberid" label="主持人" width="120"></el-table-column>
         <el-table-column prop="recordmemberid" label="记录人" width="120"></el-table-column>
         <el-table-column prop="createtime" label="会议时间" width="200">

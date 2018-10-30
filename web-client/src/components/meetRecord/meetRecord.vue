@@ -10,6 +10,11 @@
         <el-form-item label="会议主题" prop="title">
           <el-input v-model="formData.title"  style="width:500px"></el-input>
         </el-form-item>
+        <el-form-item label="会议类别" prop="meettype">
+            <el-select v-model="value" placeholder="请选择会议类别">
+              <el-option label="周例会" value="周例会"></el-option>
+            </el-select>
+        </el-form-item>
         <el-form-item label="主持人" prop="hoster">
           <el-input v-model="formData.hoster" style="width:200px"></el-input>
         </el-form-item>
