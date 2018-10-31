@@ -4,8 +4,15 @@
       <el-col :span="5">
         <div class="page-title" id="vip-title">会议纪要查询</div>
       </el-col>
-      <el-col :span="18">
-
+      <el-col span="18">
+            <el-button type="primary" style="float:right;margin:0 5px;" @click="refreshData">检索</el-button>
+            <el-input v-model="title" placeholder="输入会议主题" style="width:200px;float:right;margin:0 5px;"></el-input>
+            <el-select style="float:right;" v-model="meettype" placeholder="会议类别" @change="refreshData">
+              <el-option label="全部类别" value="0"></el-option>
+              <el-option label="部门周例会" value="部门周例会"></el-option>
+              <el-option label="团队周例会" value="团队周例会"></el-option>
+              <el-option label="需求讨论会" value="需求讨论会"></el-option>
+            </el-select>
       </el-col>
     </el-row>
     <div class="bills-wrapper">
@@ -65,7 +72,9 @@ export default {
     return {
       tableData: [],
       dialogVisible: false,
-      dialogData: ""
+      dialogData: "",
+      meettype: "",
+      title:''
     };
   },
   mounted() {
@@ -79,14 +88,16 @@ export default {
         new Date(date).toTimeString().slice(0, 8)
       );
     },
-    refreshData() {
+    refreshData(val) {
       var that = this;
       that
         .axios({
           method: "post",
           url: rootPath + "/weeklyserver/meet/query",
           params: {
-            userId:window.sessionStorage.getItem("userId")
+            userId: window.sessionStorage.getItem("userId"),
+            meettype: that.meettype,
+            title:that.title
           }
         })
         .then(response => {
@@ -102,7 +113,7 @@ export default {
     lookDetail(row) {
       this.dialogData = row;
       this.dialogVisible = true;
-    },
+    }
   }
 };
 </script>

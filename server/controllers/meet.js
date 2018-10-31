@@ -29,28 +29,47 @@ async function query(ctx) {
     const query = ctx.query;
     const id = query.id;
     const userid = query.userId;
+    const meettype = query.meettype;
+    const title = '%'+query.title+'%';
     if (id) {
-        await DB.select('*').from('meetrecord').join('enums', function () {
-            this.on('meetrecord.meettype', 'enums.value');
-        }).where('meetrecord.id', id).then(res => {
+        await DB.select('*').from('meetrecord').where('meetrecord.id', id).andWhere('title','like',title).then(res => {
             ctx.state.data = res;
         })
     } else {
-        await DB.select('*').from('meetrecord').then(res => {
-            var arr = [];
-            for (var i in res) {
-                if (res[i].visiable == '1') {
-                    if (res[i].userid == userid) {
-                        arr.push(res[i]);
+        if (meettype == ''||!meettype||meettype=='0') {
+            await DB.select('*').from('meetrecord').where('title','like',title).orderBy('createtime','desc').then(res => {
+                var arr = [];
+                for (var i in res) {
+                    if (res[i].visiable == '1') {
+                        if (res[i].userid == userid) {
+                            arr.push(res[i]);
+                        }
+                    } else if (res[i].visiable == '2') {
+                        //仅参会人可见                    
+                    } else {
+                        arr.push(res[i])
                     }
-                } else if (res[i].visiable == '2') {
-                    //仅参会人可见                    
-                } else {
-                    arr.push(res[i])
                 }
-            }
-            ctx.state.data = arr;
-        })
+                ctx.state.data = arr;
+            })    
+        } else {
+            await DB.select('*').from('meetrecord').where('meettype',meettype).andWhere('title','like',title).orderBy('createtime','desc').then(res => {
+                var arr = [];
+                for (var i in res) {
+                    if (res[i].visiable == '1') {
+                        if (res[i].userid == userid) {
+                            arr.push(res[i]);
+                        }
+                    } else if (res[i].visiable == '2') {
+                        //仅参会人可见                    
+                    } else {
+                        arr.push(res[i])
+                    }
+                }
+                ctx.state.data = arr;
+            })
+        }
+        
     }
 }
 
