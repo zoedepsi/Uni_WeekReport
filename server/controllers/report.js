@@ -81,7 +81,18 @@ async function getReportsByGroup(ctx) {
     const userId = ctx.query.userId;
     //通过groupId遍历userID
     var data = {};
-    if (!userId || userId == '99999') {
+    if (groupId == '1' && (!userId || userId == '99999')) {
+        await DB.select('id', 'truename').from('user').then(async res => {
+            var userArr = res;
+            for (var i = 0; i < userArr.length; i++) {
+                await DB.select('*').from('report').where('userId', userArr[i].id).andWhere('createTime', '>=', startTime).andWhere('createTime', '<=', endTime).then(res => {
+                    if (res.length > 0) {
+                        data[userArr[i].truename] = res;
+                    }
+                })
+            }
+        })
+    } else if (groupId != '1' && (!userId || userId == '99999')) {
         await DB.select('id', 'truename').from('user').where('groupid', groupId).then(async res => {
             var userArr = res;
             for (var i = 0; i < userArr.length; i++) {

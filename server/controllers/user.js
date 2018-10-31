@@ -77,9 +77,16 @@ async function resetpass(ctx) {
  */
 async function getusersbygroupid(ctx) {
     const groupId = ctx.query.groupId;
-    await DB.select('id', 'truename').from('user').where('groupId', groupId).then(res => {
-        ctx.state.data = res;
-    })
+    if (groupId != '1') {
+        await DB.select('id', 'truename').from('user').where('groupId', groupId).then(res => {
+            ctx.state.data = res;
+        })    
+    } else {
+        await DB.select('id', 'truename').from('user').orderBy('groupId').then(res => {
+            ctx.state.data = res;
+        })
+    }
+    
 }
 
 async function getuseridbyname(ctx) {
