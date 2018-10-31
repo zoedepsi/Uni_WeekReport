@@ -23,14 +23,14 @@
             <ul>
               <li v-for="(item,index) in scope.row.content.worked" :key="index" style="display:flex;justify-content:space-between;padding:0 30px;margin:5px 0;">
                 <span>{{index+1}}. {{item.content}}</span>
-                <span>完成度：{{item.complete}}%</span>
+                <span>完成度：{{item.complete}}</span>
               </li>
             </ul>
             <p  style="color:#888;font-size:12px;">下周工作计划</p>
             <ul>
               <li v-for="(item,index) in scope.row.content.toWork" :key="index"  style="display:flex;justify-content:space-between;padding:0 30px;margin:5px 0;">
                 <span>{{index+1}}. {{item.content}}</span>
-                <span>完成度：{{item.complete}}%</span>
+                <span>完成度：{{item.complete}}</span>
               </li>
             </ul>
             <!-- <el-button type="primary" size="mini" @click="routerTo(scope.$index, scope.row)">查看</el-button> -->
@@ -60,12 +60,13 @@
           <!-- <span>{{item.id}}</span> -->
           <el-input class="reportInput" v-model="item.content" placeholder="周报内容" :disabled="item.disableEdit"></el-input>
           <el-select class="reportSel" v-model="item.complete" placeholder="完成度">
-            <el-option label="0%" value="0"></el-option>
-            <el-option label="20%" value="20"></el-option>
-            <el-option label="50%" value="50"></el-option>
-            <el-option label="60%" value="60"></el-option>
-            <el-option label="80%" value="80"></el-option>
-            <el-option label="100%" value="100"></el-option>
+            <el-option label="0%" value="0%"></el-option>
+            <el-option label="40%" value="20%"></el-option>
+            <el-option label="60%" value="60%"></el-option>
+            <el-option label="80%" value="80%"></el-option>
+            <el-option label="100%" value="100%"></el-option>
+            <el-option label="已暂停" value="已暂停"></el-option>
+            <el-option label="已取消" value="已取消"></el-option>
           </el-select>
           <el-button class="delBtn" type="danger" @click="delItem(index,0)" :disabled="formData.worked.length==1 || item.disableEdit">x</el-button>
           <el-button class="addBtn" type="primary" @click="addItem(0)" v-if="formData.worked.length-1==index">+</el-button>
@@ -75,12 +76,11 @@
           <!-- <span>{{item.id}}</span> -->
           <el-input class="reportInput" v-model="item.content" placeholder="周报内容"></el-input>
           <el-select class="reportSel" v-model="item.complete" placeholder="完成度">
-            <el-option label="0%" value="0"></el-option>
-            <el-option label="20%" value="20"></el-option>
-            <el-option label="50%" value="50"></el-option>
-            <el-option label="60%" value="60"></el-option>
-            <el-option label="80%" value="80"></el-option>
-            <el-option label="100%" value="100"></el-option>
+            <el-option label="0%" value="0%"></el-option>
+            <el-option label="20%" value="40%"></el-option>
+            <el-option label="60%" value="60%"></el-option>
+            <el-option label="80%" value="80%"></el-option>
+            <el-option label="100%" value="100%"></el-option>
           </el-select>
           <el-button class="delBtn" type="danger" @click="delItem(index,1)" :disabled="formData.toWork.length==1">x</el-button>
           <el-button class="addBtn" type="primary" @click="addItem(1)" v-if="formData.toWork.length-1==index">+</el-button>
@@ -98,12 +98,13 @@
           <!-- <span>{{item.id}}</span> -->
           <el-input class="reportInput" v-model="item.content" placeholder="周报内容"  :disabled="item.disableEdit"></el-input>
           <el-select class="reportSel" v-model="item.complete" placeholder="完成度">
-            <el-option label="0%" value="0"></el-option>
-            <el-option label="20%" value="20"></el-option>
-            <el-option label="50%" value="50"></el-option>
-            <el-option label="60%" value="60"></el-option>
-            <el-option label="80%" value="80"></el-option>
-            <el-option label="100%" value="100"></el-option>
+            <el-option label="0%" value="0%"></el-option>
+            <el-option label="50%" value="40%"></el-option>
+            <el-option label="60%" value="60%"></el-option>
+            <el-option label="80%" value="80%"></el-option>
+            <el-option label="100%" value="100%"></el-option>
+                        <el-option label="已暂停" value="已暂停"></el-option>
+            <el-option label="已取消" value="已取消"></el-option>
           </el-select>
           <el-button class="delBtn" type="danger" @click="delItem(index,0)" :disabled="formData.worked.length==1 || item.disableEdit">x</el-button>
           <el-button class="addBtn" type="primary" @click="addItem(0)" v-if="formData.worked.length-1==index">+</el-button>
@@ -113,12 +114,11 @@
           <!-- <span>{{item.id}}</span> -->
           <el-input class="reportInput" v-model="item.content" placeholder="周报内容"></el-input>
           <el-select class="reportSel" v-model="item.complete" placeholder="完成度">
-            <el-option label="0%" value="0"></el-option>
-            <el-option label="20%" value="20"></el-option>
-            <el-option label="50%" value="50"></el-option>
-            <el-option label="60%" value="60"></el-option>
-            <el-option label="80%" value="80"></el-option>
-            <el-option label="100%" value="100"></el-option>
+            <el-option label="0%" value="0%"></el-option>
+            <el-option label="50%" value="40%"></el-option>
+            <el-option label="60%" value="60%"></el-option>
+            <el-option label="80%" value="80%"></el-option>
+            <el-option label="100%" value="100%"></el-option>
           </el-select>
           <el-button class="delBtn" type="danger" @click="delItem(index,1)" :disabled="formData.toWork.length==1">x</el-button>
           <el-button class="addBtn" type="primary" @click="addItem(1)" v-if="formData.toWork.length-1==index">+</el-button>
