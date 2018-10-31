@@ -42,6 +42,11 @@
             <editor class="editor" :value="formData.content" :setting="editorSetting" @input="(content)=> formData.content = content"></editor>
           </div>
         </el-form-item>
+        <el-form-item label="可见范围">
+            <el-radio v-model="formData.visiable" label="0">所有人可见</el-radio>
+  <el-radio v-model="formData.visiable" label="1">仅自己可见</el-radio>
+  <el-radio v-model="formData.visiable" label="2" disabled>仅参会人可见</el-radio>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit('formData')">提交</el-button>
           <el-button @click="cancelSubmit">取消</el-button>
@@ -86,7 +91,8 @@ export default {
         content:
           "1. 会议摘要<br><br><br><br><br><br>2. 会议决议<br><br><br><br><br><br>3. 待解决问题<br><br><br><br> ",
         userid: "",
-        meettype: ""
+        meettype: "",
+        visiable:'0'
       },
       rules: {
         title: [{ required: true, message: "请输入会议主题", trigger: "blur" }],
@@ -156,7 +162,9 @@ export default {
                 content:
                   "1. 会议摘要<br><br><br><br><br><br>2. 会议决议<br><br><br><br><br><br>3. 待解决问题<br><br><br><br> ",
                 userid: "",
-                meettype: ""
+                meettype: "",
+        visiable:'0'
+
               };
             })
             .catch(res => {
@@ -179,7 +187,11 @@ export default {
         persons: [],
         content:
           "1. 会议摘要<br><br><br><br><br><br>2. 会议决议<br><br><br><br><br><br>3. 待解决问题<br><br><br><br> ",
-        userid: ""
+        userid: "",
+                meettype: "",
+
+        visiable:'0'
+
       };
     }
   },

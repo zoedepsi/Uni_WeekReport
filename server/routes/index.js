@@ -3,7 +3,7 @@ const controllers = require('../controllers')
 const router = require('koa-router')({
   prefix: '/weeklyserver'
 })
-//公共借口
+//公共接口
 router.post('/queryEnums',controllers.common.queryEnums)
 //用户类接口
 router.post('/login',controllers.user.login)

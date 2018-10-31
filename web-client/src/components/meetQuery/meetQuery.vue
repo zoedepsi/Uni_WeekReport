@@ -12,7 +12,7 @@
       <el-table :data="tableData" stripe style="width: 100%;">
         <el-table-column prop="id" label="ID" width="80"></el-table-column>
         <el-table-column prop="title" label="会议主题"></el-table-column>
-        <el-table-column prop="label" label="会议类别" width="100"></el-table-column>
+        <el-table-column prop="meettype" label="会议类别" width="150"></el-table-column>
         <el-table-column prop="hostmemberid" label="主持人" width="120"></el-table-column>
         <el-table-column prop="recordmemberid" label="记录人" width="120"></el-table-column>
         <el-table-column prop="createtime" label="会议时间" width="200">
@@ -32,6 +32,9 @@
         <el-form-item label="会议主题:" prop="title">
           <span>{{dialogData.title}}</span>
         </el-form-item>
+                <el-form-item label="会议类别:" prop="title">
+          <span>{{dialogData.meettype}}</span>
+        </el-form-item>
         <el-form-item label="主持人:" prop="hoster">
           <span>{{dialogData.hostmemberid}}</span>
         </el-form-item>
@@ -47,12 +50,6 @@
         <el-form-item label="会议内容:" prop="content">
           <div v-html='dialogData.content'></div>
         </el-form-item>
-          <el-form-item label="待解决问题:" prop="toDeal">
-            <span>{{dialogData.notDeal}}</span>
-          </el-form-item>
-          <el-form-item label="会议决议:" prop="dealed">
-            <span>{{dialogData.dealed}}</span>
-          </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogVisible = false">关 闭</el-button>
@@ -88,7 +85,9 @@ export default {
         .axios({
           method: "post",
           url: rootPath + "/weeklyserver/meet/query",
-          params: {}
+          params: {
+            userId:window.sessionStorage.getItem("userId")
+          }
         })
         .then(response => {
           that.tableData = response.data.data;
