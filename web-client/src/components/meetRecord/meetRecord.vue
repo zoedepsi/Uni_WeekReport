@@ -11,8 +11,10 @@
           <el-input v-model="formData.title"  style="width:500px"></el-input>
         </el-form-item>
         <el-form-item label="会议类别" prop="meettype">
-            <el-select v-model="value" placeholder="请选择会议类别">
-              <el-option label="周例会" value="周例会"></el-option>
+            <el-select v-model="formData.meettype" placeholder="请选择会议类别">
+              <el-option label="部门周例会" value="部门周例会"></el-option>
+              <el-option label="团队周例会" value="团队周例会"></el-option>
+              <el-option label="需求讨论会" value="需求讨论会"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="主持人" prop="hoster">
@@ -40,15 +42,9 @@
             <editor class="editor" :value="formData.content" :setting="editorSetting" @input="(content)=> formData.content = content"></editor>
           </div>
         </el-form-item>
-        <el-form-item label="待解决问题" prop="toDeal">
-          <el-input type="textarea" autosize v-model="formData.toDeal"></el-input>
-        </el-form-item>
-        <el-form-item label="会议决议" prop="dealed">
-          <el-input type="textarea" autosize v-model="formData.dealed"></el-input>
-        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="onSubmit('formData')">提交</el-button>
-          <el-button>取消</el-button>
+          <el-button @click="cancelSubmit">取消</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -87,13 +83,14 @@ export default {
         recorder: "",
         time: "",
         persons: [],
-        content: "",
-        toDeal: "",
-        dealed: "",
-        userid: ""
+        content:
+          "1. 会议摘要<br><br><br><br><br><br>2. 会议决议<br><br><br><br><br><br>3. 待解决问题<br><br><br><br> ",
+        userid: "",
+        meettype: ""
       },
       rules: {
         title: [{ required: true, message: "请输入会议主题", trigger: "blur" }],
+        meettype: [{ required: true, message: "请选择会议类别", trigger: "blur" }],
         hoster: [
           { required: true, message: "请输入会议主持人", trigger: "blur" }
         ],
@@ -102,11 +99,7 @@ export default {
         ],
         time: [{ validator: validatetime, trigger: "blur" }],
         persons: [{ validator: validatepersons, trigger: "blur" }],
-        content: [{ validator: validatecontent, trigger: "blur" }],
-        toDeal: [
-          { required: true, message: "请输入待解决问题", trigger: "blur" }
-        ],
-        dealed: [{ required: true, message: "请输入会议决议", trigger: "blur" }]
+        content: [{ validator: validatecontent, trigger: "blur" }]
       },
       inputVisible: false,
       inputValue: "",
@@ -160,10 +153,10 @@ export default {
                 recorder: "",
                 time: "",
                 persons: [],
-                content: "",
-                toDeal: "",
-                dealed: "",
-                userid: ""
+                content:
+                  "1. 会议摘要<br><br><br><br><br><br>2. 会议决议<br><br><br><br><br><br>3. 待解决问题<br><br><br><br> ",
+                userid: "",
+                meettype: ""
               };
             })
             .catch(res => {
@@ -176,6 +169,18 @@ export default {
           return false;
         }
       });
+    },
+    cancelSubmit() {
+      this.formData = {
+        title: "",
+        hoster: "",
+        recorder: "",
+        time: "",
+        persons: [],
+        content:
+          "1. 会议摘要<br><br><br><br><br><br>2. 会议决议<br><br><br><br><br><br>3. 待解决问题<br><br><br><br> ",
+        userid: ""
+      };
     }
   },
   computed: {},

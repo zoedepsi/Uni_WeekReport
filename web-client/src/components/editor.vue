@@ -1,5 +1,6 @@
 <template>
-        <textarea :id="id" :value="value"></textarea>
+        <textarea :id="id" :value="value">
+        </textarea>
 </template>
 <script>
 // Import TinyMCE
@@ -7,6 +8,7 @@ import tinymce from "tinymce/tinymce";
 import "tinymce/themes/modern/theme";
 import "tinymce/plugins/paste";
 import "tinymce/plugins/link";
+import "tinymce/plugins/template";
 const INIT = 0;
 const CHANGED = 2;
 var EDITOR = null;
@@ -49,7 +51,6 @@ export default {
           _this.$emit("input", content);
         });
       },
-      plugins: []
     };
     Object.assign(setting, _this.setting);
     tinymce.init(setting);

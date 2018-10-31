@@ -8,9 +8,8 @@ async function add(ctx) {
         persons = query.persons,
         time = query.time,
         content = query.content,
-        toDeal = query.toDeal,
-        userid = query.userid,
-        dealed = query.dealed;
+        meettype=query.meettype,
+        userid = query.userid;
     await DB('meetrecord').insert({
         'hostmemberid': hoster,
         'recordmemberid': recorder,
@@ -18,9 +17,8 @@ async function add(ctx) {
         'content': content,
         'createtime': time,
         'members': persons.toString(),
-        'notDeal': toDeal,
-        'dealed': dealed,
-        'userid': userid
+        'userid': userid,
+        'meettype':meettype
     }).then(res => {
         ctx.state.msg = "添加成功"
     })
