@@ -148,11 +148,32 @@ async function updateReports(ctx) {
     })
 }
 
+async function queryCount(ctx) {
+    var data = {};
+    var startTime = getWeekFirstDay(new Date());
+    var endTime = getWeekLastDay(new Date());
+    await DB.count('id').from('report').where('createTime', '>', startTime).andWhere('createTime', '<', endTime).then(res => {
+        data.totalCount = res[0]["count(`id`)"];
+    })
+    await DB('report').count('report.id').innerJoin('user', function () {
+        this.on('user.id', '=', 'report.userId')
+    }).where('user.groupId', "3").andWhere('report.createTime', '>', startTime).andWhere('report.createTime', '<', endTime).then(res => {
+        data.requireCount = res[0]["count(`report`.`id`)"];
+    })
+    await DB('report').count('report.id').innerJoin('user', function () {
+        this.on('user.id', '=', 'report.userId')
+    }).where('user.groupId', "2").andWhere('report.createTime', '>', startTime).andWhere('report.createTime', '<', endTime).then(res => {
+        data.devCount = res[0]["count(`report`.`id`)"];
+    })
+    ctx.state.data = data;
+}
+
 module.exports = {
     getReports,
     addReports,
     updateReports,
     getReportsByGroup,
     getReportById,
-    getLastWeekReport
+    getLastWeekReport,
+    queryCount
 }

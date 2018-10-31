@@ -4,7 +4,7 @@
       <el-col :span="5">
         <div class="page-title" id="vip-title">会议纪要查询</div>
       </el-col>
-      <el-col span="18">
+      <el-col :span="18">
             <el-button type="primary" style="float:right;margin:0 5px;" @click="refreshData">检索</el-button>
             <el-input v-model="title" placeholder="输入会议主题" style="width:200px;float:right;margin:0 5px;"></el-input>
             <el-select style="float:right;" v-model="meettype" placeholder="会议类别" @change="refreshData">
@@ -58,6 +58,15 @@
           <div v-html='dialogData.content'></div>
         </el-form-item>
       </el-form>
+      <div style="display:flex;align-items:flex-end;margin-bottom:10px;">
+      <el-input v-model="discuss" placeholder="" type="textarea" :rows='2'></el-input>
+<el-button size="small" style="margin-left:10px;" type="primary" @click="addDiscuss">评论</el-button>
+      </div>
+
+      <div class="discussList" v-for="(item,index) in discussList" :key="index">
+        <p><span>{{item.truename}}:</span><span>{{formatDate(item.createtime)}}</span></p>
+        <div class="item">{{item.content}}</div>
+      </div>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogVisible = false">关 闭</el-button>
       </span>
@@ -74,7 +83,10 @@ export default {
       dialogVisible: false,
       dialogData: "",
       meettype: "",
-      title:''
+      title: "",
+      discuss: "",
+      rightId: "",
+      discussList: []
     };
   },
   mounted() {
@@ -97,7 +109,7 @@ export default {
           params: {
             userId: window.sessionStorage.getItem("userId"),
             meettype: that.meettype,
-            title:that.title
+            title: that.title
           }
         })
         .then(response => {
@@ -113,16 +125,65 @@ export default {
     lookDetail(row) {
       this.dialogData = row;
       this.dialogVisible = true;
+      this.rightId = row.id;
+      this.queryDiscuss();
+    },
+    addDiscuss() {
+      var that = this;
+      that
+        .axios({
+          method: "post",
+          url: rootPath + "/weeklyserver/meet/addMeetDiscuss",
+          params: {
+            createdby: window.sessionStorage.getItem("userId"),
+            content: that.discuss,
+            relateid: that.rightId
+          }
+        })
+        .then(response => {
+          that.$message({
+            message: "添加成功",
+            type: "success"
+          });
+          that.queryDiscuss();
+          that.discuss="";
+        })
+        .catch(res => {
+          that.$message({
+            message: response.data.msg,
+            type: "warrning"
+          });
+        });
+    },
+    queryDiscuss() {
+      var that = this;
+      that
+        .axios({
+          method: "post",
+          url: rootPath + "/weeklyserver/meet/queryDiscuss",
+          params: {
+            relateid: that.rightId
+          }
+        })
+        .then(response => {
+          that.discussList = response.data.data;
+        })
+        .catch(res => {
+          that.$message({
+            message: response.data.msg,
+            type: "warrning"
+          });
+        });
     }
   }
 };
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus" scoped>
+<style scoped>
 .page-title {
   border-left: 3px solid #699fff;
   text-indent: 8px;
-  font-family: 'Microsoft YaHei';
+  font-family: "Microsoft YaHei";
   font-size: 18px;
   margin-top: 9px;
 }
@@ -165,9 +226,10 @@ export default {
   display: block;
 }
 
-.clearfix:before, .clearfix:after {
+.clearfix:before,
+.clearfix:after {
   display: table;
-  content: '';
+  content: "";
 }
 
 .clearfix:after {
@@ -177,5 +239,17 @@ export default {
 .detail_dialog {
   height: 400px;
   overflow-y: scroll;
+}
+.discussList p {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  color: #ccc;
+  margin: 5px 0;
+}
+.discussList .item {
+  margin: 5px;
+  padding: 5px;
+  border-bottom: 1px solid #eee;
 }
 </style>

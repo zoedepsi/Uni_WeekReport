@@ -1,5 +1,23 @@
 const DB = require('../config')
 
+function getWeekFirstDay(day) {
+    var date = new Date(day);
+    date.setDate(date.getDate() + 1 - date.getDay());
+    var month = date.getMonth() + 1;
+    month = month < 10 ? "0" + month : month;
+    var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+    return date.getFullYear() + "-" + month + "-" + day;
+}
+
+function getWeekLastDay(day) {
+    var date = new Date(day);
+    date.setDate(date.getDate() + 7 - date.getDay());
+    var month = date.getMonth() + 1;
+    month = month < 10 ? "0" + month : month;
+    var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+    return date.getFullYear() + "-" + month + "-" + day;
+}
+
 async function add(ctx) {
     const query = JSON.parse(ctx.query.formData);
     const title = query.title,
@@ -30,14 +48,14 @@ async function query(ctx) {
     const id = query.id;
     const userid = query.userId;
     const meettype = query.meettype;
-    const title = '%'+query.title+'%';
+    const title = '%' + query.title + '%';
     if (id) {
-        await DB.select('*').from('meetrecord').where('meetrecord.id', id).andWhere('title','like',title).then(res => {
+        await DB.select('*').from('meetrecord').where('meetrecord.id', id).andWhere('title', 'like', title).then(res => {
             ctx.state.data = res;
         })
     } else {
-        if (meettype == ''||!meettype||meettype=='0') {
-            await DB.select('*').from('meetrecord').where('title','like',title).orderBy('createtime','desc').then(res => {
+        if (meettype == '' || !meettype || meettype == '0') {
+            await DB.select('*').from('meetrecord').where('title', 'like', title).orderBy('createtime', 'desc').then(res => {
                 var arr = [];
                 for (var i in res) {
                     if (res[i].visiable == '1') {
@@ -51,9 +69,9 @@ async function query(ctx) {
                     }
                 }
                 ctx.state.data = arr;
-            })    
+            })
         } else {
-            await DB.select('*').from('meetrecord').where('meettype',meettype).andWhere('title','like',title).orderBy('createtime','desc').then(res => {
+            await DB.select('*').from('meetrecord').where('meettype', meettype).andWhere('title', 'like', title).orderBy('createtime', 'desc').then(res => {
                 var arr = [];
                 for (var i in res) {
                     if (res[i].visiable == '1') {
@@ -69,12 +87,54 @@ async function query(ctx) {
                 ctx.state.data = arr;
             })
         }
-        
+
     }
+}
+
+async function queryCount(ctx) {
+    var data = {};
+    var startTime = getWeekFirstDay(new Date());
+    var endTime = getWeekLastDay(new Date());
+    await DB.count('id').from('meetrecord').where('createtime', '>', startTime).andWhere('meetrecord.createtime', '<', endTime).then(res => {
+        data.totalCount = res[0]["count(`id`)"];
+    })
+    await DB.count('id').from('meetrecord').where('createtime', '>', startTime).andWhere('meetrecord.createtime', '<', endTime).andWhere('meettype', '需求讨论会').then(res => {
+        data.requireCount = res[0]["count(`id`)"];
+    })
+    await DB.count('id').from('meetrecord').where('createtime', '>', startTime).andWhere('meetrecord.createtime', '<', endTime).andWhere('meettype', '研发讨论会').then(res => {
+        data.devCount = res[0]["count(`id`)"];
+    })
+    ctx.state.data = data;
+}
+async function addMeetDiscuss(ctx) {
+    var relateid = ctx.query.relateid;
+    var content = ctx.query.content;
+    var createdby = ctx.query.createdby;
+    await DB.insert({
+        'relateid': relateid,
+        'content': content,
+        'createdby': createdby
+    }).into('meetdiscuss').then(res => {
+        ctx.state.data = res;
+    })
+}
+
+async function queryDiscuss(ctx) {
+    var id = ctx.query.relateid;
+    await DB.select('meetdiscuss.content','user.truename','meetdiscuss.createtime').from('meetdiscuss').innerJoin('meetrecord', function () {
+        this.on('meetdiscuss.relateid', '=', 'meetrecord.id')
+    }).innerJoin('user', function () {
+        this.on('user.id', '=', 'meetdiscuss.createdby')
+    }).where('meetdiscuss.relateid', id).orderBy('createtime','desc').then(res => {
+        ctx.state.data = res;
+    })
 }
 
 
 module.exports = {
     add,
-    query
+    query,
+    queryCount,
+    addMeetDiscuss,
+    queryDiscuss
 }

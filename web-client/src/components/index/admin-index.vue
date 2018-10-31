@@ -1,34 +1,69 @@
 <template>
-  <div class="welcome">
-    <!-- <div class="banner"></div> -->
-    <div class="gaishu">
-      <div class="title" style="color:rgb(0,122,204)">欢 迎 登 陆 周 报 管 理 平 台</div>
-      <!-- <el-card class="index-box-card">
-        <div class="dataitem link" @click="changeView('dealwithdraw')">
-          <div class="data-item-title">待发货订单</div>
-          <div class="data-item-data">{{withdrawReqCount}} <span>个</span></div>
+  <div class="content-wrapper">
+      <div class="card-title">会议纪要</div>
+      <div class="index-card-row">
+        <div class="index-card-col">
+          <div class="content-panel">
+            <div class="content-panel-title">本周会议总次数</div>
+            <div class="content-panel-value total-color">{{datas.totalCount}}<span>次</span></div>
+            <div class="content-panel-detail">
+              <!-- <span>在线支付 0.00元</span> -->
+              <!-- &nbsp;&nbsp;<span>货到付款 0.00元</span> -->
+              </div>
+          </div>
+          <div class="content-panel-border"></div>
         </div>
-        <div class="dataitem link">
-          <div class="data-item-title">销售总金额</div>
-          <div class="data-item-data">{{sumtotal}} <span>元</span></div>
+        <div class="index-card-col">
+          <div class="content-panel">
+            <div class="content-panel-title">需求讨论会</div>
+            <div class="content-panel-value meituan-color">{{datas.requireCount}}<span>次</span></div>
+            <!-- <div class="content-panel-detail"><span>在线支付 0.00元</span>
+              &nbsp;&nbsp;<span>货到付款 0.00元</span></div> -->
+          </div>
+          <div class="content-panel-border"></div>
         </div>
-        <div class="dataitem link">
-          <div class="data-item-title">会员总数</div>
-          <div class="data-item-data">{{usercount}} <span>人</span></div>
+        <div class="index-card-col">
+          <div class="content-panel">
+            <div class="content-panel-title">研发讨论会
+            </div>
+            <div class="content-panel-value eleme-color">{{datas.devCount}}<span>次</span></div>
+            <!-- <div class="content-panel-detail"><span>在线支付 0.00元</span>
+              &nbsp;&nbsp;<span>货到付款 0.00元</span></div> -->
+          </div>
         </div>
-      </el-card> -->
-      <div class="detail">
-        <h1>V0.2 使用说明</h1>
-        <p>1. 数据以团队为单位进行隔离，团队成员可查看团队内部所有人的周报</p>
-        <p>2. 除本周周报之外，其他周报不可编辑</p>
-        <p>3. 本周仅可填写一次周报</p>
-        <p>4. 本周工作总结由上周工作计划自动生成且不允许修改，所以填写周报需要严肃慎重</p>
-        <h1>V0.3 待开发内容</h1>
-        <p>2. 根据下周工作计划及待办事项自动生成下周周报</p>
-        <p>3. 周报编辑功能</p>
-        <p>4. 各位同事的反馈需求及建议</p>
       </div>
-    </div>
+            <div class="card-title">周报</div>
+      <div class="index-card-row">
+        <div class="index-card-col">
+          <div class="content-panel">
+            <div class="content-panel-title">本周周报条数</div>
+            <div class="content-panel-value total-color">{{datas2.totalCount}}<span>条</span></div>
+            <div class="content-panel-detail">
+              <!-- <span>在线支付 0.00元</span> -->
+              <!-- &nbsp;&nbsp;<span>货到付款 0.00元</span> -->
+              </div>
+          </div>
+          <div class="content-panel-border"></div>
+        </div>
+        <div class="index-card-col">
+          <div class="content-panel">
+            <div class="content-panel-title">企划部</div>
+            <div class="content-panel-value meituan-color">{{datas2.requireCount}}<span>条</span></div>
+            <!-- <div class="content-panel-detail"><span>在线支付 0.00元</span>
+              &nbsp;&nbsp;<span>货到付款 0.00元</span></div> -->
+          </div>
+          <div class="content-panel-border"></div>
+        </div>
+        <div class="index-card-col">
+          <div class="content-panel">
+            <div class="content-panel-title">研发部
+            </div>
+            <div class="content-panel-value eleme-color">{{datas2.devCount}}<span>条</span></div>
+            <!-- <div class="content-panel-detail"><span>在线支付 0.00元</span>
+              &nbsp;&nbsp;<span>货到付款 0.00元</span></div> -->
+          </div>
+        </div>
+      </div>
   </div>
 </template>
 
@@ -36,36 +71,141 @@
 import { rootPath } from "../../config/apiConfig";
 export default {
   data() {
-    return {};
+    return {
+      datas: "",
+      datas2:''
+    };
+  },
+  mounted() {
+    this.queryCount();
+    this.queryCount2();
   },
 
-  methods: {}
+  methods: {
+    queryCount() {
+      var that = this;
+      this.axios({
+        method: "get",
+        url: rootPath + "/weeklyserver/meet/queryCount"
+      }).then(response => {
+        if (response.data.code == "00000") {
+          that.datas = response.data.data;
+        } else if (response.data == undefined) {
+          this.$message({
+            message: "系统请求发生错误",
+            type: "error"
+          });
+        } else {
+          this.$message({
+            message: response.data.msg,
+            type: "error"
+          });
+        }
+      });
+    },
+    queryCount2() {
+      var that = this;
+      this.axios({
+        method: "get",
+        url: rootPath + "/weeklyserver/report/queryCount"
+      }).then(response => {
+        if (response.data.code == "00000") {
+          that.datas2 = response.data.data;
+        } else if (response.data == undefined) {
+          this.$message({
+            message: "系统请求发生错误",
+            type: "error"
+          });
+        } else {
+          this.$message({
+            message: response.data.msg,
+            type: "error"
+          });
+        }
+      });
+    },
+  }
 };
 </script>
 
 <style scoped>
+.content-wrapper {
+  min-height: 100px;
+  width: 90%;
+  margin: 0 auto;
+  display: block;
+}
 
-.title{
-  font-size: 50px;
-  margin: auto 0;
+.card-title {
+  line-height: 40px;
+  margin-right: 30px;
+}
+
+.card-title:before {
+  content: "";
+  border-left: 2px solid #88b7e0;
+  margin-right: 10px;
+}
+
+.index-card-row {
+  margin: 10px 0 20px;
+  width: 100%;
+  height: 150px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f7f7f7;
+}
+
+.index-card-col {
+  float: left;
+  width: 33.33%;
+  position: relative;
+}
+
+.content-panel {
+  width: 90%;
+  height: 130px;
+  margin: 10px auto;
+}
+
+.content-panel-title {
+  width: 100%;
+  line-height: 30px;
+  font-size: 14px;
+  color: #777;
+}
+
+.content-panel-value {
+  width: 100%;
+  line-height: 65px;
   text-align: center;
-  margin: 80px;
+  font-size: 28px;
+  color: #777;
 }
-.detail{
-  width:500px;
-  margin:0 auto;
-  background: #3A8FB7;
-  color: white;
-  padding: 10px;
-  border-radius: 10px;
-  box-shadow: 5px 5px 10px #888888;
+
+.total-color {
+  color: #ff5b73;
 }
-.detail h1{
-  font-size: 20px;
-  font-weight: bold;
-  margin: 10px 0;
+
+.content-panel-detail {
+  width: 100%;
+  font-size: 12px;
+  color: #999;
+  text-align: center;
+  margin-top: -5px;
 }
-.detail p{
-  margin:5px 0;
+
+.content-panel-detail span {
+  display: inline-block;
+  line-height: 15px;
+}
+
+.content-panel-border {
+  width: 1px;
+  height: 90px;
+  border-right: 1px solid #ccc;
+  right: 1px;
+  top: 30px;
+  position: absolute;
 }
 </style>

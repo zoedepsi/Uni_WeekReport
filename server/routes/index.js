@@ -18,10 +18,15 @@ router.post('/report/getbyid',controllers.report.getReportById)
 router.post('/report/add',controllers.report.addReports)
 router.post('/report/update',controllers.report.updateReports)
 router.post('/report/getbygroup',controllers.report.getReportsByGroup)
-router.post('/report/getLastWeekReport',controllers.report.getLastWeekReport)
+router.post('/report/getLastWeekReport', controllers.report.getLastWeekReport)
+router.get('/report/queryCount',controllers.report.queryCount)
+
 
 //会议纪要接口
 router.post('/meet/add', controllers.meet.add)
-router.post('/meet/query',controllers.meet.query)
+router.post('/meet/query', controllers.meet.query)
+router.get('/meet/queryCount', controllers.meet.queryCount)
+router.post('/meet/addMeetDiscuss', controllers.meet.addMeetDiscuss)
+router.post('/meet/queryDiscuss', controllers.meet.queryDiscuss)
 module.exports = router
 
