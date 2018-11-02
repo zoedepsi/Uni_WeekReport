@@ -28,6 +28,10 @@
               <el-menu-item index='v-meetRecord'>新建纪要</el-menu-item>
               <el-menu-item index='v-meetQuery'>纪要查询</el-menu-item>
             </el-submenu>
+            <el-submenu  index='4'>
+              <template slot="title">个人中心</template>
+              <el-menu-item index='v-setting'>个人设置</el-menu-item>
+            </el-submenu>
           </el-menu>
         </el-col>
       </div>
@@ -47,6 +51,7 @@ import reportManage from "../reportManage/reportManage.vue";
 import reportQuery from "../reportQuery/reportQuery.vue";
 import meetRecord from "../meetRecord/meetRecord.vue";
 import meetQuery from "../meetQuery/meetQuery.vue"
+import setting from "../setting/setting.vue"
 export default {
   data() {
     return {
@@ -74,7 +79,8 @@ export default {
     "v-reportManage": reportManage,
     "v-reportQuery": reportQuery,
     "v-meetRecord": meetRecord,
-    "v-meetQuery":meetQuery
+    "v-meetQuery":meetQuery,
+    "v-setting":setting
   }
 };
 </script>

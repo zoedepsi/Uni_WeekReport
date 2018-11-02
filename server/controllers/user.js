@@ -80,21 +80,52 @@ async function getusersbygroupid(ctx) {
     if (groupId != '1') {
         await DB.select('id', 'truename').from('user').where('groupId', groupId).then(res => {
             ctx.state.data = res;
-        })    
+        })
     } else {
         await DB.select('id', 'truename').from('user').orderBy('groupId').then(res => {
             ctx.state.data = res;
         })
     }
-    
+
 }
 
 async function getuseridbyname(ctx) {
-    const truename =  ctx.query.truename;
+    const truename = ctx.query.truename;
     const querys = '%' + truename + '%';
     await DB.select('truename').from('user').where('truename', 'like', querys).then(res => {
         ctx.state.data = res;
     })
+}
+
+async function updateUserInfo(ctx) {
+    const truename = ctx.query.truename;
+    const email = ctx.query.email;
+    const id = ctx.query.id;
+    await DB('user').update({
+        'truename': truename,
+        'email': email
+    }).where('id', id).then(res => {
+        ctx.state.data = res;
+    })
+}
+async function updatePassword(ctx) {
+    const oldPass = ctx.query.oldPass;
+    const newPass = ctx.query.newPass;
+    const id = ctx.query.id;
+
+    await DB.select('password').from('user').where('id', id).then(async res => {
+        if (res[0].password == oldPass) {
+            await DB('user').update({
+                'password': newPass,
+            }).where('id', id).then(res => {
+                ctx.state.data = res;
+            })
+        } else {
+            ctx.state.code = '1000';
+            ctx.state.msg = '原密码错误，请重新输入';            
+        }
+    })
+
 }
 
 
@@ -103,5 +134,7 @@ module.exports = {
     register,
     resetpass,
     getusersbygroupid,
-    getuseridbyname
+    getuseridbyname,
+    updateUserInfo,
+    updatePassword
 }

@@ -83,6 +83,7 @@ export default {
               window.sessionStorage.setItem('trueName',data.truename);
               window.sessionStorage.setItem('roleId',data.roleId);
               window.sessionStorage.setItem('groupId',data.groupId);
+              window.sessionStorage.setItem('email',data.email);
               this.$router.push({ path: "/admin-main" });
             } else if (response.data == undefined) {
               this.$message({
