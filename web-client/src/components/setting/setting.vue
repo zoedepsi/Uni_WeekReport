@@ -47,10 +47,11 @@
 import Vue from "vue";
 import { rootPath } from "../../config/apiConfig";
 import { valid } from "semver";
-var trueName = sessionStorage.getItem("trueName");
-var email = sessionStorage.getItem("email");
+
 export default {
   data() {
+    var trueName = sessionStorage.getItem("trueName");
+    var email = sessionStorage.getItem("email");
     return {
       basicInfo: {
         name: trueName,
@@ -77,6 +78,11 @@ export default {
     };
   },
   mounted() {},
+  created() {
+    if (!window.sessionStorage.getItem("userId")) {
+      this.$router.push({ path: "/login" });
+    }
+  },
   methods: {
     formatDate: function(date) {
       return (

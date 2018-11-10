@@ -72,6 +72,9 @@ export default {
     }
   },
   created() {
+    if(!window.sessionStorage.getItem("userId")){
+      this.$router.push({ path: "/login" });
+    }
     this.userData.trueName = window.sessionStorage.getItem("trueName");
   },
   components: {

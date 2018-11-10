@@ -160,7 +160,11 @@ export default {
   mounted() {
     this.refreshData();
   },
-
+  created() {
+    if(!window.sessionStorage.getItem("userId")){
+      this.$router.push({ path: "/login" });
+    }
+  },
   methods: {
     formatDate: function(date) {
       return (

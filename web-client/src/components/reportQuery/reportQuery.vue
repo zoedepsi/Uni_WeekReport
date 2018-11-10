@@ -167,7 +167,11 @@ export default {
     }
     this.refreshData();
   },
-
+  created() {
+    if(!window.sessionStorage.getItem("userId")){
+      this.$router.push({ path: "/login" });
+    }
+  },
   methods: {
     getWeekFirstDay(day) {
       var date = new Date(day);

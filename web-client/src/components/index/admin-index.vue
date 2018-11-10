@@ -83,7 +83,11 @@
       this.queryCount();
       this.queryCount2();
     },
-
+  created() {
+    if(!window.sessionStorage.getItem("userId")){
+      this.$router.push({ path: "/login" });
+    }
+  },
     methods: {
       queryCount() {
         var that = this;

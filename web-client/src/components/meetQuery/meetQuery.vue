@@ -94,6 +94,11 @@ export default {
   mounted() {
     this.refreshData();
   },
+  created() {
+    if (!window.sessionStorage.getItem("userId")) {
+      this.$router.push({ path: "/login" });
+    }
+  },
   methods: {
     formatDate: function(date) {
       return (
@@ -148,7 +153,7 @@ export default {
             type: "success"
           });
           that.queryDiscuss();
-          that.discuss="";
+          that.discuss = "";
         })
         .catch(res => {
           that.$message({

@@ -118,7 +118,11 @@ export default {
   },
 
   mounted() {},
-
+  created() {
+    if(!window.sessionStorage.getItem("userId")){
+      this.$router.push({ path: "/login" });
+    }
+  },
   methods: {
     handleClose(tag) {
       this.formData.persons.splice(this.formData.persons.indexOf(tag), 1);
