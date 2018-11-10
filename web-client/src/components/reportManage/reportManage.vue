@@ -61,7 +61,8 @@
           <el-input class="reportInput" v-model="item.content" placeholder="周报内容" :disabled="item.disableEdit"></el-input>
           <el-select class="reportSel" v-model="item.complete" placeholder="完成度">
             <el-option label="0%" value="0%"></el-option>
-            <el-option label="40%" value="20%"></el-option>
+            <el-option label="20%" value="20%"></el-option>
+            <el-option label="40%" value="40%"></el-option>
             <el-option label="60%" value="60%"></el-option>
             <el-option label="80%" value="80%"></el-option>
             <el-option label="100%" value="100%"></el-option>
@@ -77,7 +78,8 @@
           <el-input class="reportInput" v-model="item.content" placeholder="周报内容"></el-input>
           <el-select class="reportSel" v-model="item.complete" placeholder="完成度">
             <el-option label="0%" value="0%"></el-option>
-            <el-option label="20%" value="40%"></el-option>
+            <el-option label="20%" value="20%"></el-option>
+            <el-option label="40%" value="40%"></el-option>
             <el-option label="60%" value="60%"></el-option>
             <el-option label="80%" value="80%"></el-option>
             <el-option label="100%" value="100%"></el-option>
@@ -99,11 +101,12 @@
           <el-input class="reportInput" v-model="item.content" placeholder="周报内容"  :disabled="item.disableEdit"></el-input>
           <el-select class="reportSel" v-model="item.complete" placeholder="完成度">
             <el-option label="0%" value="0%"></el-option>
-            <el-option label="50%" value="40%"></el-option>
+            <el-option label="20%" value="20%"></el-option>
+            <el-option label="40%" value="40%"></el-option>
             <el-option label="60%" value="60%"></el-option>
             <el-option label="80%" value="80%"></el-option>
             <el-option label="100%" value="100%"></el-option>
-                        <el-option label="已暂停" value="已暂停"></el-option>
+            <el-option label="已暂停" value="已暂停"></el-option>
             <el-option label="已取消" value="已取消"></el-option>
           </el-select>
           <el-button class="delBtn" type="danger" @click="delItem(index,0)" :disabled="formData.worked.length==1 || item.disableEdit">x</el-button>
@@ -115,7 +118,8 @@
           <el-input class="reportInput" v-model="item.content" placeholder="周报内容"></el-input>
           <el-select class="reportSel" v-model="item.complete" placeholder="完成度">
             <el-option label="0%" value="0%"></el-option>
-            <el-option label="50%" value="40%"></el-option>
+            <el-option label="20%" value="20%"></el-option>
+            <el-option label="40%" value="40%"></el-option>
             <el-option label="60%" value="60%"></el-option>
             <el-option label="80%" value="80%"></el-option>
             <el-option label="100%" value="100%"></el-option>

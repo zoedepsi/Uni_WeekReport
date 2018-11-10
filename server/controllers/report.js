@@ -150,8 +150,8 @@ async function updateReports(ctx) {
 
 async function queryCount(ctx) {
     var data = {};
-    var startTime = getWeekFirstDay(new Date());
-    var endTime = getWeekLastDay(new Date());
+    var startTime = getLastWeekFirstDay(new Date());
+    var endTime = getLastWeekLastDay(new Date());
     await DB.count('id').from('report').where('createTime', '>', startTime).andWhere('createTime', '<', endTime).then(res => {
         data.totalCount = res[0]["count(`id`)"];
     })
