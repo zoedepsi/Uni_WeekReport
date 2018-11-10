@@ -12,7 +12,9 @@ router.post('/password/reset',controllers.user.resetpass)
 router.post('/user/getbygroup',controllers.user.getusersbygroupid)
 router.post('/user/getuseridbyname',controllers.user.getuseridbyname)
 router.post('/user/updateUserInfo',controllers.user.updateUserInfo)
-router.post('/user/updatePassword',controllers.user.updatePassword)
+router.post('/user/updatePassword', controllers.user.updatePassword)
+router.get('/user/getGroup',controllers.user.getGroup)
+
 
 //周报接口
 router.post('/report/get',controllers.report.getReports)

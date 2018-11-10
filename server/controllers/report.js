@@ -71,49 +71,25 @@ async function getReportById(ctx) {
 async function getReportsByGroup(ctx) {
     var date = new Date();
     var firstDay = getWeekFirstDay(date);
-    var lastDay = getWeekLastDay(date);
-
+    const lastWeekfirstDay = getLastWeekFirstDay(new Date(firstDay));
+    const lastWeeklastDay = getLastWeekLastDay(new Date(firstDay));
     const groupId = ctx.query.groupId;
-    const startTime = ctx.query.startTime ? ctx.query.startTime : firstDay;
-    const endTime = (ctx.query.endTime ? ctx.query.endTime : lastDay) + ' ' + '24:00:00';
-    const lastWeekfirstDay = getLastWeekFirstDay(new Date(startTime));
-    const lastWeeklastDay = getLastWeekLastDay(new Date(startTime));
-    const userId = ctx.query.userId;
+    const startTime = ctx.query.startTime ? ctx.query.startTime : lastWeekfirstDay;
+    const endTime = (ctx.query.endTime ? ctx.query.endTime : lastWeeklastDay) + ' ' + '24:00:00';
     //通过groupId遍历userID
     var data = {};
-    if (groupId == '1' && (!userId || userId == '99999')) {
-        await DB.select('id', 'truename').from('user').then(async res => {
-            var userArr = res;
-            for (var i = 0; i < userArr.length; i++) {
-                await DB.select('*').from('report').where('userId', userArr[i].id).andWhere('createTime', '>=', startTime).andWhere('createTime', '<=', endTime).then(res => {
-                    if (res.length > 0) {
-                        data[userArr[i].truename] = res;
-                    }
-                })
-            }
-        })
-    } else if (groupId != '1' && (!userId || userId == '99999')) {
-        await DB.select('id', 'truename').from('user').where('groupid', groupId).then(async res => {
-            var userArr = res;
-            for (var i = 0; i < userArr.length; i++) {
-                await DB.select('*').from('report').where('userId', userArr[i].id).andWhere('createTime', '>=', startTime).andWhere('createTime', '<=', endTime).then(res => {
-                    if (res.length > 0) {
-                        data[userArr[i].truename] = res;
-                    }
-                })
-            }
-        })
-    } else {
-        await DB.select('truename').from('user').where('id', userId).then(async res => {
-            var truename = res[0].truename;
-            await DB.select('*').from('report').where('userId', userId).andWhere('createTime', '>=', startTime).andWhere('createTime', '<=', endTime).then(res => {
-                data[truename] = res;
+    await DB.select('id', 'truename').from('user').where('groupid', groupId).then(async res => {
+        var userArr = res;
+        for (var i = 0; i < userArr.length; i++) {
+            await DB.select('*').from('report').where('userId', userArr[i].id).andWhere('createTime', '>=', startTime).andWhere('createTime', '<=', endTime).then(res => {
+                if (res.length > 0) {
+                    data[userArr[i].truename] = res;
+                }
             })
-        })
-    }
+        }
+    })
 
     ctx.state.data = data;
-
 }
 
 
@@ -162,7 +138,7 @@ async function queryCount(ctx) {
     })
     await DB('report').count('report.id').innerJoin('user', function () {
         this.on('user.id', '=', 'report.userId')
-    }).where('user.groupId',"<>", "5").andWhere('report.createTime', '>', startTime).andWhere('report.createTime', '<', endTime).then(res => {
+    }).where('user.groupId', "<>", "5").andWhere('report.createTime', '>', startTime).andWhere('report.createTime', '<', endTime).then(res => {
         data.devCount = res[0]["count(`report`.`id`)"];
     })
     ctx.state.data = data;

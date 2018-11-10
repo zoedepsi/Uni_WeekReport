@@ -96,7 +96,11 @@ async function getuseridbyname(ctx) {
         ctx.state.data = res;
     })
 }
-
+async function getGroup(ctx) {
+    await DB.select('*').from('group').where('id','<>','1').then(res => {
+        ctx.state.data = res;
+    })
+}
 async function updateUserInfo(ctx) {
     const truename = ctx.query.truename;
     const email = ctx.query.email;
@@ -122,7 +126,7 @@ async function updatePassword(ctx) {
             })
         } else {
             ctx.state.code = '1000';
-            ctx.state.msg = '原密码错误，请重新输入';            
+            ctx.state.msg = '原密码错误，请重新输入';
         }
     })
 
@@ -136,5 +140,6 @@ module.exports = {
     getusersbygroupid,
     getuseridbyname,
     updateUserInfo,
-    updatePassword
+    updatePassword,
+    getGroup
 }
