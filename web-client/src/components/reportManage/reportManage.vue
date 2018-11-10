@@ -36,16 +36,16 @@
             <!-- <el-button type="primary" size="mini" @click="routerTo(scope.$index, scope.row)">查看</el-button> -->
           </template>
         </el-table-column>
-        <el-table-column  label="创建时间" width='120'>
+        <el-table-column  label="创建时间" width='200'>
           <template slot-scope="scope">
             <span>{{formatDate(scope.row.createTime)}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="上次更新时间" width='120'>
+        <!-- <el-table-column label="上次更新时间" width='120'>
                     <template slot-scope="scope">
             <span>{{formatDate(scope.row.updateTime)}}</span>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="操作" width='100'>
           <template slot-scope="scope">
           <el-button type="primary" @click="editReport(scope.row.id)" :disabled="scope.row.createTime<getWeekFirstDay(new Date())">编辑</el-button>
@@ -53,7 +53,7 @@
         </el-table-column>
       </el-table>
     </div>
-    <el-dialog title="填写周报" :visible.sync="dialogVisible" :before-close="clickCancel">
+    <el-dialog title="填写周报" :visible.sync="dialogVisible" :before-close="clickCancel" :close-on-click-modal=false :close-on-press-escape=false>
       <div class="formContent">
         <p class="repTitle">本周工作总结</p>
         <div class="report" :key="index" v-for="(item,index) in formData.worked">
@@ -91,7 +91,7 @@
         <el-button type="primary" @click="submitReport">提 交</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="编辑周报" :visible.sync="dialogVisible2" :before-close="clickCancel2">
+    <el-dialog title="编辑周报" :visible.sync="dialogVisible2" :before-close="clickCancel2"  :close-on-click-modal=false :close-on-press-escape=false>
       <div class="formContent">
         <p class="repTitle">本周工作总结</p>
         <div class="report" :key="index" v-for="(item,index) in formData.worked">

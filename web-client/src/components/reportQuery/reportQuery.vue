@@ -25,15 +25,15 @@
               <p style="color:#888;font-size:12px;">本周工作内容</p>
               <ul>
                 <li v-for="(item,index) in scope.row.content.worked" :key="index" style="display:flex;justify-content:space-between;padding:0 30px;margin:5px 0;">
-                  <span>{{index+1}}. {{item.content}}</span>
-                  <span>完成度：{{item.complete}}</span>
+                  <span  style="display:block;width:80%;">{{index+1}}. {{item.content}}</span>
+                  <span style="display:block;">完成度：{{item.complete}}</span>
                 </li>
               </ul>
               <p style="color:#888;font-size:12px;">下周工作计划</p>
               <ul>
                 <li v-for="(item,index) in scope.row.content.toWork" :key="index" style="display:flex;justify-content:space-between;padding:0 30px;margin:5px 0;">
-                  <span>{{index+1}}. {{item.content}}</span>
-                  <span>完成度：{{item.complete}}</span>
+                  <span  style="display:block;width:80%;">{{index+1}}. {{item.content}}</span>
+                  <span  style="display:block;">完成度：{{item.complete}}</span>
                 </li>
               </ul>
               <!-- <el-button type="primary" size="mini" @click="routerTo(scope.$index, scope.row)">查看</el-button> -->
@@ -44,11 +44,11 @@
               <span>{{formatDate(scope.row.createTime)}}</span>
             </template>
           </el-table-column>
-          <el-table-column label="上次更新时间" width='200'>
+          <!-- <el-table-column label="上次更新时间" width='200'>
             <template slot-scope="scope">
               <span>{{formatDate(scope.row.updateTime)}}</span>
             </template>
-          </el-table-column>
+          </el-table-column> -->
           <!-- <el-table-column label="操作" width='100'>
           <template slot-scope="scope">
           <el-button type="primary">查看详情</el-button>
