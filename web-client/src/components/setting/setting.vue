@@ -10,31 +10,31 @@
     <div class="bills-wrapper">
       <el-tabs style="width:50%;margin:20px auto;" type="border-card">
         <el-tab-pane label="基本信息">
-          <el-form style="width:50%;" ref="basicInfo" :model="basicInfo" label-width="80px">
-            <el-form-item label="真实姓名">
+          <el-form style="width:50%;" ref="basicInfo" :rules="basicInfoRules" :model="basicInfo" label-width="80px">
+            <el-form-item label="真实姓名" prop="name">
               <el-input v-model="basicInfo.name"></el-input>
             </el-form-item>
-            <el-form-item label="邮箱">
+            <el-form-item label="邮箱" prop="email">
               <el-input v-model="basicInfo.email"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="onSubmitBasic">提交</el-button>
+              <el-button type="primary" @click="onSubmitBasic('basicInfo')">提交</el-button>
             </el-form-item>
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="密码修改">
-          <el-form style="width:50%;" ref="passInfo" :model="passInfo" label-width="100px">
-            <el-form-item label="旧密码">
+          <el-form style="width:50%;" ref="passInfo" :rules="passInfoRules" :model="passInfo" label-width="100px">
+            <el-form-item label="旧密码" prop="oldPass">
               <el-input v-model="passInfo.oldPass" type="password"></el-input>
             </el-form-item>
-            <el-form-item label="新密码">
+            <el-form-item label="新密码" prop="newPass">
               <el-input v-model="passInfo.newPass" type="password"></el-input>
             </el-form-item>
-                       <el-form-item label="确认新密码">
+                       <el-form-item label="确认新密码" prop="againPass">
               <el-input v-model="passInfo.againPass" type="password"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="onSubmitPassword">提交</el-button>
+              <el-button type="primary" @click="onSubmitPassword('passInfo')">提交</el-button>
             </el-form-item>
           </el-form>
         </el-tab-pane>
@@ -46,6 +46,7 @@
 <script type='text/ecmascript-6'>
 import Vue from "vue";
 import { rootPath } from "../../config/apiConfig";
+import { valid } from "semver";
 var trueName = sessionStorage.getItem("trueName");
 var email = sessionStorage.getItem("email");
 export default {
@@ -55,10 +56,23 @@ export default {
         name: trueName,
         email: email
       },
-      passInfo:{
-        oldPass:'',
-        newPass:'',
-        againPass:''
+      passInfo: {
+        oldPass: "",
+        newPass: "",
+        againPass: ""
+      },
+      basicInfoRules: {
+        name: { required: true, message: "请输入真实姓名", trigger: "blur" },
+        email: { required: true, message: "请输入工作邮箱", trigger: "blur" }
+      },
+      passInfoRules: {
+        oldPass: { required: true, message: "请输入原密码", trigger: "blur" },
+        newPass: { required: true, message: "请输入新密码", trigger: "blur" },
+        againPass: {
+          required: true,
+          message: "请再次输入新密码",
+          trigger: "blur"
+        }
       }
     };
   },
@@ -71,73 +85,85 @@ export default {
         new Date(date).toTimeString().slice(0, 8)
       );
     },
-    onSubmitBasic() {
+    onSubmitBasic(formName) {
       var that = this;
-      this.axios({
-        method: "post",
-        url: rootPath + "/weeklyserver/user/updateUserInfo",
-        params: {
-          truename: that.basicInfo.name,
-          email: that.basicInfo.email,
-          id: sessionStorage.getItem("userId")
-        }
-      }).then(response => {
-        if (response.data.code == "00000") {
-          this.$message({
-            message: "更新成功",
-            type: "success"
-          });
-          sessionStorage.setItem("trueName", that.basicInfo.name);
-          sessionStorage.setItem("email", that.basicInfo.email);
-        } else if (response.data == undefined) {
-          this.$message({
-            message: "系统请求发生错误",
-            type: "error"
-          });
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          that
+            .axios({
+              method: "post",
+              url: rootPath + "/weeklyserver/user/updateUserInfo",
+              params: {
+                truename: that.basicInfo.name,
+                email: that.basicInfo.email,
+                id: sessionStorage.getItem("userId")
+              }
+            })
+            .then(response => {
+              if (response.data.code == "00000") {
+                this.$message({
+                  message: "更新成功",
+                  type: "success"
+                });
+                sessionStorage.setItem("trueName", that.basicInfo.name);
+                sessionStorage.setItem("email", that.basicInfo.email);
+              } else if (response.data == undefined) {
+                this.$message({
+                  message: "系统请求发生错误",
+                  type: "error"
+                });
+              } else {
+                this.$message({
+                  message: response.data.msg,
+                  type: "error"
+                });
+              }
+            });
         } else {
-          this.$message({
-            message: response.data.msg,
-            type: "error"
-          });
+          return false;
         }
       });
     },
-    onSubmitPassword(){
+    onSubmitPassword(formName) {
       var that = this;
-      if(that.passInfo.newPass!=that.passInfo.againPass){
-         that.$message({
-            message: "两次密码输入不一致",
-            type: "warning"
-          });
-          return;
-      }
-      this.axios({
-        method: "post",
-        url: rootPath + "/weeklyserver/user/updatePassword",
-        params: {
-          newPass: that.passInfo.newPass,
-          id: sessionStorage.getItem("userId"),
-          oldPass:that.passInfo.oldPass
-        }
-      }).then(response => {
-        if (response.data.code == "00000") {
-          this.$message({
-            message: "更新成功",
-            type: "success"
-          });
-          that.passInfo={
-
+      that.$refs[formName].validate(valid => {
+        if (valid) {
+          if (that.passInfo.newPass != that.passInfo.againPass) {
+            that.$message({
+              message: "两次密码输入不一致",
+              type: "warning"
+            });
+            return;
           }
-        } else if (response.data == undefined) {
-          this.$message({
-            message: "系统请求发生错误",
-            type: "error"
+          this.axios({
+            method: "post",
+            url: rootPath + "/weeklyserver/user/updatePassword",
+            params: {
+              newPass: that.passInfo.newPass,
+              id: sessionStorage.getItem("userId"),
+              oldPass: that.passInfo.oldPass
+            }
+          }).then(response => {
+            if (response.data.code == "00000") {
+              this.$message({
+                message: "更新成功",
+                type: "success"
+              });
+              that.passInfo = {};
+            } else if (response.data == undefined) {
+              this.$message({
+                message: "系统请求发生错误",
+                type: "error"
+              });
+            } else {
+              this.$message({
+                message: response.data.msg,
+                type: "error"
+              });
+            }
           });
         } else {
-          this.$message({
-            message: response.data.msg,
-            type: "error"
-          });
+          return false;
         }
       });
     }

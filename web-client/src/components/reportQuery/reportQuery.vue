@@ -26,14 +26,14 @@
               <ul>
                 <li v-for="(item,index) in scope.row.content.worked" :key="index" style="display:flex;justify-content:space-between;padding:0 30px;margin:5px 0;">
                   <span>{{index+1}}. {{item.content}}</span>
-                  <span>完成度：{{item.complete}}%</span>
+                  <span>完成度：{{item.complete}}</span>
                 </li>
               </ul>
               <p style="color:#888;font-size:12px;">下周工作计划</p>
               <ul>
                 <li v-for="(item,index) in scope.row.content.toWork" :key="index" style="display:flex;justify-content:space-between;padding:0 30px;margin:5px 0;">
                   <span>{{index+1}}. {{item.content}}</span>
-                  <span>完成度：{{item.complete}}%</span>
+                  <span>完成度：{{item.complete}}</span>
                 </li>
               </ul>
               <!-- <el-button type="primary" size="mini" @click="routerTo(scope.$index, scope.row)">查看</el-button> -->

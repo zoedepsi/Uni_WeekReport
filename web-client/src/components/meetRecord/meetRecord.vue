@@ -15,6 +15,8 @@
               <el-option label="部门周例会" value="部门周例会"></el-option>
               <el-option label="团队周例会" value="团队周例会"></el-option>
               <el-option label="需求讨论会" value="需求讨论会"></el-option>
+              <el-option label="研发讨论会" value="研发讨论会"></el-option>
+              <el-option label="其他" value="其他"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="主持人" prop="hoster">
