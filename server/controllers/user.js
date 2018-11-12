@@ -97,7 +97,7 @@ async function getuseridbyname(ctx) {
     })
 }
 async function getGroup(ctx) {
-    await DB.select('*').from('group').where('id','<>','1').then(res => {
+    await DB.select('*').from('group').then(res => {
         ctx.state.data = res;
     })
 }

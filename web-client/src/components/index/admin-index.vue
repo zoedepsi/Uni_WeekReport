@@ -47,7 +47,7 @@
       </div>
       <div class="index-card-col">
         <div class="content-panel">
-          <div class="content-panel-title">企划部</div>
+          <div class="content-panel-title">企划研发项目管理团队</div>
           <div class="content-panel-value meituan-color">{{datas2.requireCount}}<span>条</span></div>
           <!-- <div class="content-panel-detail"><span>在线支付 0.00元</span>
               &nbsp;&nbsp;<span>货到付款 0.00元</span></div> -->
@@ -56,7 +56,7 @@
       </div>
       <div class="index-card-col">
         <div class="content-panel">
-          <div class="content-panel-title">研发部
+          <div class="content-panel-title">研发团队
           </div>
           <div class="content-panel-value eleme-color">{{datas2.devCount}}<span>条</span></div>
           <!-- <div class="content-panel-detail"><span>在线支付 0.00元</span>

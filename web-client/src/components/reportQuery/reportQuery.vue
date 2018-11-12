@@ -160,7 +160,7 @@ export default {
     if (groupId == "1") {
       this.getGroup();
       this.groupSelect = true;
-      this.groupValue = 2;
+      this.groupValue = 1;
       this.getuserbygroup(groupId);
     }else{
       this.groupValue= groupId;

@@ -133,12 +133,12 @@ async function queryCount(ctx) {
     })
     await DB('report').count('report.id').innerJoin('user', function () {
         this.on('user.id', '=', 'report.userId')
-    }).where('user.groupId', "5").andWhere('report.createTime', '>', startTime).andWhere('report.createTime', '<', endTime).then(res => {
+    }).where('user.groupId', "1").andWhere('report.createTime', '>', startTime).andWhere('report.createTime', '<', endTime).then(res => {
         data.requireCount = res[0]["count(`report`.`id`)"];
     })
     await DB('report').count('report.id').innerJoin('user', function () {
         this.on('user.id', '=', 'report.userId')
-    }).where('user.groupId', "<>", "5").andWhere('report.createTime', '>', startTime).andWhere('report.createTime', '<', endTime).then(res => {
+    }).where('user.groupId', "<>", "1").andWhere('report.createTime', '>', startTime).andWhere('report.createTime', '<', endTime).then(res => {
         data.devCount = res[0]["count(`report`.`id`)"];
     })
     ctx.state.data = data;
