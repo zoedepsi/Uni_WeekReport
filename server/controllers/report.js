@@ -143,6 +143,29 @@ async function queryCount(ctx) {
     })
     ctx.state.data = data;
 }
+async function addReportDiscuss(ctx) {
+    var relateid = ctx.query.relateid;
+    var content = ctx.query.content;
+    var createdby = ctx.query.createdby;
+    await DB.insert({
+        'relateid': relateid,
+        'content': content,
+        'createdby': createdby
+    }).into('reportDiscuss').then(res => {
+        ctx.state.data = res;
+    })
+}
+
+async function queryDiscuss(ctx) {
+    var id = ctx.query.relateid;
+    await DB.select('reportDiscuss.content','user.truename','reportDiscuss.createtime').from('reportDiscuss').innerJoin('report', function () {
+        this.on('reportDiscuss.relateid', '=', 'report.id')
+    }).innerJoin('user', function () {
+        this.on('user.id', '=', 'reportDiscuss.createdby')
+    }).where('reportDiscuss.relateid', id).orderBy('createtime','desc').then(res => {
+        ctx.state.data = res;
+    })
+}
 
 module.exports = {
     getReports,
@@ -151,5 +174,7 @@ module.exports = {
     getReportsByGroup,
     getReportById,
     getLastWeekReport,
-    queryCount
+    queryCount,
+    addReportDiscuss,
+    queryDiscuss
 }

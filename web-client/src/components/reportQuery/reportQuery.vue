@@ -3,7 +3,7 @@
     <el-row>
       <el-col :span="10">
         <div class="page-title" id="vip-title">周报查询<span style="font-size:12px;color:#666;">(默认显示上周周报)</span></div>
-        
+
       </el-col>
       <el-col :span="14">
         <!-- <el-button type="primary" style="float:right;margin-right:10px" @click="addClass" :disabled="tableData.length>0?true:false">填写周报</el-button> -->
@@ -14,7 +14,8 @@
           <el-option v-for="item in users" :key="item.id" :label="item.truename" :value="item.id">
           </el-option>
         </el-select> -->
-        <el-select style="float:right;margin-right:10px" v-show='groupSelect' v-model="groupValue" placeholder="选择团队" @change="getreportbygroup">
+        <el-select style="float:right;margin-right:10px" v-show='groupSelect' v-model="groupValue" placeholder="选择团队"
+          @change="getreportbygroup">
           <el-option v-for="item in groups" :key="item.id" :label="item.remark" :value="item.id">
           </el-option>
         </el-select>
@@ -45,6 +46,11 @@
           <el-table-column label="创建时间" width='200'>
             <template slot-scope="scope">
               <span>{{formatDate(scope.row.createTime)}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width='100'>
+            <template slot-scope="scope">
+              <el-button type="warning" size='small' @click="showDiscuss(scope.row.id)">更多</el-button>
             </template>
           </el-table-column>
           <!-- <el-table-column label="上次更新时间" width='200'>
@@ -127,420 +133,509 @@
         <el-button type="primary">提 交</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="评论" :visible.sync="dialogVisible3" :before-close="clickCancel3" :close-on-click-modal=false
+      :close-on-press-escape=false>
+      <div class="addDiscuss" style="display:flex;align-items:flex-end;margin-bottom:20px;">
+        <el-input type='textarea' :rows='2' v-model="discussValue"></el-input>
+        <el-button type='primary' size='small' style="margin-left:20px;" @click="submitDiscuss">提交</el-button>
+      </div>
+      <div class="discussList" v-for="(item,index) in discussList" :key="index">
+        <p><span>{{item.truename}}:</span><span>{{formatDate(item.createtime)}}</span></p>
+        <div class="item">{{item.content}}</div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="clickCancel3">关 闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script type='text/ecmascript-6'>
-import { rootPath } from "../../config/apiConfig";
+  import {
+    rootPath
+  } from "../../config/apiConfig";
 
-export default {
-  data() {
-    return {
-      users: [],
-      groups: [],
-      groupSelect: false,
-      userValue: "",
-      groupValue: "",
-      pickOption: {
-        firstDayOfWeek: 1
+  export default {
+    data() {
+      return {
+        users: [],
+        groups: [],
+        groupSelect: false,
+        userValue: "",
+        groupValue: "",
+        pickOption: {
+          firstDayOfWeek: 1
+        },
+        discussValue:'',
+        discussList:[],
+        tableData: [],
+        dateFormat: "yyyy-MM-dd",
+        dateValue: "",
+        dialogVisible: false,
+        dialogVisible2: false,
+        dialogVisible3:false,
+        formData: {
+          worked: [],
+          toWork: []
+        }
+      };
+    },
+
+    mounted() {
+      var groupId = sessionStorage.getItem("groupId");
+      if (groupId == "1") {
+        this.getGroup();
+        this.groupSelect = true;
+        this.groupValue = 1;
+        this.getuserbygroup(groupId);
+      } else {
+        this.groupValue = groupId;
+      }
+      this.refreshData();
+    },
+    created() {
+      if (!window.sessionStorage.getItem("userId")) {
+        this.$router.push({
+          path: "/login"
+        });
+      }
+    },
+    methods: {
+      getWeekFirstDay(day) {
+        var date = new Date(day);
+        date.setDate(date.getDate() + 1 - date.getDay());
+        var month = date.getMonth() + 1;
+        month = month < 10 ? "0" + month : month;
+        var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+        return date.getFullYear() + "-" + month + "-" + day;
       },
-      tableData: [],
-      dateFormat: "yyyy-MM-dd",
-      dateValue: "",
-      dialogVisible: false,
-      dialogVisible2: false,
-      formData: {
-        worked: [],
-        toWork: []
-      }
-    };
-  },
-
-  mounted() {
-    var groupId = sessionStorage.getItem("groupId");
-    if (groupId == "1") {
-      this.getGroup();
-      this.groupSelect = true;
-      this.groupValue = 1;
-      this.getuserbygroup(groupId);
-    }else{
-      this.groupValue= groupId;
-    }
-    this.refreshData();
-  },
-  created() {
-    if(!window.sessionStorage.getItem("userId")){
-      this.$router.push({ path: "/login" });
-    }
-  },
-  methods: {
-    getWeekFirstDay(day) {
-      var date = new Date(day);
-      date.setDate(date.getDate() + 1 - date.getDay());
-      var month = date.getMonth() + 1;
-      month = month < 10 ? "0" + month : month;
-      var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-      return date.getFullYear() + "-" + month + "-" + day;
-    },
-    getWeekLastDay(day) {
-      var date = new Date(day);
-      date.setDate(date.getDate() + 7 - date.getDay());
-      var month = date.getMonth() + 1;
-      month = month < 10 ? "0" + month : month;
-      var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-      return date.getFullYear() + "-" + month + "-" + day;
-    },
-    // getreportbyuser(val) {
-    //   var that = this;
-    //   if (that.dateValue) {
-    //     var startDay = this.getWeekFirstDay(that.dateValue);
-    //     var endDay = this.getWeekLastDay(that.dateValue);
-    //     this.refreshData(startDay, endDay, val);
-    //   } else {
-    //     this.refreshData(undefined, undefined, val);
-    //   }
-    // },
-    getreportbygroup() {
-      var that = this;
-      that.getuserbygroup(that.groupValue);
-      if (that.dateValue) {
-        var startDay = this.getWeekFirstDay(that.dateValue);
-        var endDay = this.getWeekLastDay(that.dateValue);
-        this.refreshData(startDay, endDay);
-      } else {
-        this.refreshData();
-      }
-    },
-    getuserbygroup(groupId) {
-      var that = this;
-      that
-        .axios({
-          method: "post",
-          url: rootPath + "/weeklyserver/user/getbygroup",
-          params: {
-            groupId: groupId
-          }
-        })
-        .then(response => {
-          if (response.data.data) {
-            var data = response.data.data;
-            that.users = data;
-          } else {
-            this.$message({
-              message: response.data.msg,
-              type: "error"
-            });
-          }
-        });
-    },
-    getGroup() {
-      var that = this;
-      that
-        .axios({
-          method: "get",
-          url: rootPath + "/weeklyserver/user/getGroup"
-        })
-        .then(response => {
-          if (response.data.data) {
-            var data = response.data.data;
-            that.groups = data;
-          } else {
-            this.$message({
-              message: response.data.msg,
-              type: "error"
-            });
-          }
-        });
-    },
-    tableRowComplete(row, rowIndex) {
-      if (row.complete == 0) {
-        return "danger-row";
-      }
-      if (row.complete > 0 && row.complete < 60) {
-        return "waring-row";
-      }
-      if (row.complete > 0 && row.complete > 80) {
-        return "success-row";
-      }
-    },
-    formatDate: function(date) {
-      return (
-        new Date(date).toLocaleDateString() +
-        " " +
-        new Date(date).toTimeString().slice(0, 8)
-      );
-    },
-    getWeekFirstDay(day) {
-      var date = new Date(day);
-      date.setDate(date.getDate() + 1 - date.getDay());
-      var month = date.getMonth() + 1;
-      month = month < 10 ? "0" + month : month;
-      var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-      return date.getFullYear() + "-" + month + "-" + day;
-    },
-    getWeekLastDay(day) {
-      var date = new Date(day);
-      date.setDate(date.getDate() + 7 - date.getDay());
-      var month = date.getMonth() + 1;
-      month = month < 10 ? "0" + month : month;
-      var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
-      return date.getFullYear() + "-" + month + "-" + day;
-    },
-    addItem(type) {
-      if (type == 0) {
-        var lastItem = this.formData.worked[this.formData.worked.length - 1];
-        this.formData.worked.push({
-          id: lastItem.id + 1,
-          content: "",
-          complete: "0"
-        });
-      } else {
-        var lastItem = this.formData.toWork[this.formData.toWork.length - 1];
-        this.formData.toWork.push({
-          id: lastItem.id + 1,
-          content: "",
-          complete: "0"
-        });
-      }
-    },
-    delItem(index, type) {
-      if (type == 0) {
-        this.formData.worked.splice(index, 1);
-      } else {
-        this.formData.toWork.splice(index, 1);
-      }
-    },
-    submitReport() {
-      var that = this;
-      for (var i = 0; i < that.formData.worked.length; i++) {
-        if (that.formData.worked[i].content == "") {
-          that.$message({
-            message: "请填写内容或删除空条目后进行提交",
-            type: "warning"
-          });
-          return;
+      getWeekLastDay(day) {
+        var date = new Date(day);
+        date.setDate(date.getDate() + 7 - date.getDay());
+        var month = date.getMonth() + 1;
+        month = month < 10 ? "0" + month : month;
+        var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+        return date.getFullYear() + "-" + month + "-" + day;
+      },
+      // getreportbyuser(val) {
+      //   var that = this;
+      //   if (that.dateValue) {
+      //     var startDay = this.getWeekFirstDay(that.dateValue);
+      //     var endDay = this.getWeekLastDay(that.dateValue);
+      //     this.refreshData(startDay, endDay, val);
+      //   } else {
+      //     this.refreshData(undefined, undefined, val);
+      //   }
+      // },
+      getreportbygroup() {
+        var that = this;
+        that.getuserbygroup(that.groupValue);
+        if (that.dateValue) {
+          var startDay = this.getWeekFirstDay(that.dateValue);
+          var endDay = this.getWeekLastDay(that.dateValue);
+          this.refreshData(startDay, endDay);
+        } else {
+          this.refreshData();
         }
-      }
-      for (var i = 0; i < that.formData.toWork.length; i++) {
-        if (that.formData.toWork[i].content == "") {
-          that.$message({
-            message: "请填写内容或删除空条目后进行提交",
-            type: "warning"
+      },
+      getuserbygroup(groupId) {
+        var that = this;
+        that
+          .axios({
+            method: "post",
+            url: rootPath + "/weeklyserver/user/getbygroup",
+            params: {
+              groupId: groupId
+            }
+          })
+          .then(response => {
+            if (response.data.data) {
+              var data = response.data.data;
+              that.users = data;
+            } else {
+              this.$message({
+                message: response.data.msg,
+                type: "error"
+              });
+            }
           });
-          return;
+      },
+      getGroup() {
+        var that = this;
+        that
+          .axios({
+            method: "get",
+            url: rootPath + "/weeklyserver/user/getGroup"
+          })
+          .then(response => {
+            if (response.data.data) {
+              var data = response.data.data;
+              that.groups = data;
+            } else {
+              this.$message({
+                message: response.data.msg,
+                type: "error"
+              });
+            }
+          });
+      },
+      tableRowComplete(row, rowIndex) {
+        if (row.complete == 0) {
+          return "danger-row";
         }
-      }
-      that
-        .axios({
-          method: "post",
-          url: rootPath + "/weeklyserver/report/add",
-          params: {
-            userId: window.sessionStorage.getItem("userId"),
-            content: that.formData
-          }
-        })
-        .then(response => {
-          if (response.data.code == "00000") {
+        if (row.complete > 0 && row.complete < 60) {
+          return "waring-row";
+        }
+        if (row.complete > 0 && row.complete > 80) {
+          return "success-row";
+        }
+      },
+      formatDate: function (date) {
+        return (
+          new Date(date).toLocaleDateString() +
+          " " +
+          new Date(date).toTimeString().slice(0, 8)
+        );
+      },
+      getWeekFirstDay(day) {
+        var date = new Date(day);
+        date.setDate(date.getDate() + 1 - date.getDay());
+        var month = date.getMonth() + 1;
+        month = month < 10 ? "0" + month : month;
+        var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+        return date.getFullYear() + "-" + month + "-" + day;
+      },
+      getWeekLastDay(day) {
+        var date = new Date(day);
+        date.setDate(date.getDate() + 7 - date.getDay());
+        var month = date.getMonth() + 1;
+        month = month < 10 ? "0" + month : month;
+        var day = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+        return date.getFullYear() + "-" + month + "-" + day;
+      },
+      addItem(type) {
+        if (type == 0) {
+          var lastItem = this.formData.worked[this.formData.worked.length - 1];
+          this.formData.worked.push({
+            id: lastItem.id + 1,
+            content: "",
+            complete: "0"
+          });
+        } else {
+          var lastItem = this.formData.toWork[this.formData.toWork.length - 1];
+          this.formData.toWork.push({
+            id: lastItem.id + 1,
+            content: "",
+            complete: "0"
+          });
+        }
+      },
+      delItem(index, type) {
+        if (type == 0) {
+          this.formData.worked.splice(index, 1);
+        } else {
+          this.formData.toWork.splice(index, 1);
+        }
+      },
+      submitReport() {
+        var that = this;
+        for (var i = 0; i < that.formData.worked.length; i++) {
+          if (that.formData.worked[i].content == "") {
             that.$message({
-              message: "提交成功",
-              type: "success"
+              message: "请填写内容或删除空条目后进行提交",
+              type: "warning"
             });
-            that.dialogVisible = false;
-          } else {
-            this.$message({
-              message: response.data.msg,
-              type: "error"
-            });
+            return;
           }
-        });
+        }
+        for (var i = 0; i < that.formData.toWork.length; i++) {
+          if (that.formData.toWork[i].content == "") {
+            that.$message({
+              message: "请填写内容或删除空条目后进行提交",
+              type: "warning"
+            });
+            return;
+          }
+        }
+        that
+          .axios({
+            method: "post",
+            url: rootPath + "/weeklyserver/report/add",
+            params: {
+              userId: window.sessionStorage.getItem("userId"),
+              content: that.formData
+            }
+          })
+          .then(response => {
+            if (response.data.code == "00000") {
+              that.$message({
+                message: "提交成功",
+                type: "success"
+              });
+              that.dialogVisible = false;
+            } else {
+              this.$message({
+                message: response.data.msg,
+                type: "error"
+              });
+            }
+          });
+      },
+      queryReport() {
+        var startDay = this.getWeekFirstDay(this.dateValue);
+        var endDay = this.getWeekLastDay(this.dateValue);
+        this.refreshData(startDay, endDay);
+      },
+      editClass(id) {
+        var that = this;
+        that.dialogVisible2 = true;
+
+        that
+          .axios({
+            method: "get",
+            url: rootPath + "/chuangyou-crm/classInfo/crm/classInfo",
+            params: {
+              infoKey: id
+            }
+          })
+          .then(response => {
+            if (response.data) {
+              that.formData = response.data.classInfo;
+              console.log(response.data.classInfo);
+            } else if (response.data == undefined) {
+              this.$message({
+                message: "系统请求发生错误",
+                type: "error"
+              });
+            } else if (response.data.isSucceed == false) {
+              this.$message({
+                message: response.data.returnMessage,
+                type: "error"
+              });
+            } else {
+              this.$message({
+                message: response.data.returnData.bizReturnMessage,
+                type: "error"
+              });
+            }
+          });
+      },
+
+      clickCancel() {
+        this.dialogVisible = false;
+      },
+
+      clickCancel2() {
+        this.dialogVisible2 = false;
+      },
+    clickCancel3() {
+      this.dialogVisible3 = false;
     },
-    queryReport() {
-      var startDay = this.getWeekFirstDay(this.dateValue);
-      var endDay = this.getWeekLastDay(this.dateValue);
-      this.refreshData(startDay, endDay);
+    showDiscuss(id) {
+      this.dialogVisible3 = true;
+      this.discussId = id;
+      this.queryDiscuss();
     },
-    editClass(id) {
+    submitDiscuss() {
       var that = this;
-      that.dialogVisible2 = true;
-
-      that
-        .axios({
-          method: "get",
-          url: rootPath + "/chuangyou-crm/classInfo/crm/classInfo",
-          params: {
-            infoKey: id
-          }
-        })
-        .then(response => {
-          if (response.data) {
-            that.formData = response.data.classInfo;
-            console.log(response.data.classInfo);
-          } else if (response.data == undefined) {
-            this.$message({
-              message: "系统请求发生错误",
-              type: "error"
-            });
-          } else if (response.data.isSucceed == false) {
-            this.$message({
-              message: response.data.returnMessage,
-              type: "error"
-            });
-          } else {
-            this.$message({
-              message: response.data.returnData.bizReturnMessage,
-              type: "error"
-            });
-          }
-        });
-    },
-
-    clickCancel() {
-      this.dialogVisible = false;
-    },
-
-    clickCancel2() {
-      this.dialogVisible2 = false;
-    },
-
-    addClass() {
-      this.dialogVisible = true;
-      this.formData.worked.length = 0;
-      this.formData.toWork.length = 0;
-      this.formData.worked.push({
-        id: 1,
-        content: "",
-        complete: "0"
-      });
-      this.formData.toWork.push({
-        id: 1,
-        content: "",
-        complete: "0"
-      });
-    },
-
-    refreshData(startDay, endDay) {
-      var that = this;
-      var groupId = that.groupValue;
       that
         .axios({
           method: "post",
-          url: rootPath + "/weeklyserver/report/getbygroup",
+          url: rootPath + "/weeklyserver/report/addReportDiscuss",
           params: {
-            groupId: groupId,
-            startTime: startDay,
-            endTime: endDay
+            createdby: window.sessionStorage.getItem("userId"),
+            content: that.discussValue,
+            relateid: that.discussId
           }
         })
         .then(response => {
-          if (response.data.data) {
-            var data = response.data.data;
-            Object.keys(data).forEach(function(key) {
-              for (var i = 0; i < data[key].length; i++) {
-                data[key][i].content = JSON.parse(data[key][i].content);
-              }
-            });
-            that.tableData = data;
-            console.log(data);
-          } else {
-            this.$message({
-              message: response.data.msg,
-              type: "error"
-            });
-          }
+          that.$message({
+            message: "添加成功",
+            type: "success"
+          });
+          that.queryDiscuss();
+          that.discussValue = "";
+        })
+        .catch(res => {
+          that.$message({
+            message: response.data.msg,
+            type: "warrning"
+          });
         });
+    },
+    queryDiscuss() {
+      var that = this;
+      that
+        .axios({
+          method: "post",
+          url: rootPath + "/weeklyserver/report/queryDiscuss",
+          params: {
+            relateid: that.discussId
+          }
+        })
+        .then(response => {
+          that.discussList = response.data.data;
+        })
+        .catch(res => {
+          that.$message({
+            message: response.data.msg,
+            type: "warrning"
+          });
+        });
+    },
+      addClass() {
+        this.dialogVisible = true;
+        this.formData.worked.length = 0;
+        this.formData.toWork.length = 0;
+        this.formData.worked.push({
+          id: 1,
+          content: "",
+          complete: "0"
+        });
+        this.formData.toWork.push({
+          id: 1,
+          content: "",
+          complete: "0"
+        });
+      },
+
+      refreshData(startDay, endDay) {
+        var that = this;
+        var groupId = that.groupValue;
+        that
+          .axios({
+            method: "post",
+            url: rootPath + "/weeklyserver/report/getbygroup",
+            params: {
+              groupId: groupId,
+              startTime: startDay,
+              endTime: endDay
+            }
+          })
+          .then(response => {
+            if (response.data.data) {
+              var data = response.data.data;
+              Object.keys(data).forEach(function (key) {
+                for (var i = 0; i < data[key].length; i++) {
+                  data[key][i].content = JSON.parse(data[key][i].content);
+                }
+              });
+              that.tableData = data;
+              console.log(data);
+            } else {
+              this.$message({
+                message: response.data.msg,
+                type: "error"
+              });
+            }
+          });
+      }
     }
-  }
-};
+  };
+
 </script>
 <style scoped>
-.page-title {
-  border-left: 3px solid #699fff;
-  text-indent: 8px;
-  font-family: "Microsoft YaHei";
-  font-size: 18px;
-}
+  .page-title {
+    border-left: 3px solid #699fff;
+    text-indent: 8px;
+    font-family: "Microsoft YaHei";
+    font-size: 18px;
+  }
 
-#page-title {
-  margin-bottom: 0;
-}
+  #page-title {
+    margin-bottom: 0;
+  }
 
-.bills-wrapper {
-  float: left;
-  width: 99%;
-  padding-top: 20px;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-  min-height: 30px;
-}
+  .bills-wrapper {
+    float: left;
+    width: 99%;
+    padding-top: 20px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    min-height: 30px;
+  }
 
-.time {
-  font-size: 13px;
-  color: #999;
-}
+  .time {
+    font-size: 13px;
+    color: #999;
+  }
 
-.bottom {
-  margin-top: 13px;
-  line-height: 12px;
-}
+  .bottom {
+    margin-top: 13px;
+    line-height: 12px;
+  }
 
-.button {
-  padding: 0;
-  float: right;
-}
+  .button {
+    padding: 0;
+    float: right;
+  }
 
-.image {
+  .image {
+    width: 100%;
+    display: block;
+  }
+
+  .clearfix:before,
+  .clearfix:after {
+    display: table;
+    content: "";
+  }
+
+  .clearfix:after {
+    clear: both;
+  }
+
+  .dkdia .el-dialog--small {
+    width: 40%;
+  }
+
+  .dateContainer {
+    height: 60px;
+    border: 1px solid black;
+  }
+
+  .repTitle {
+    font-size: 16px;
+    color: #ccc;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+
+  .report {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 5px 0;
+  }
+
+  .report span {
+    display: block;
+    width: 30px;
+    font-size: 16px;
+    text-align: center;
+    margin: 0 5px;
+  }
+
+  .reportInput {
+    width: 70%;
+  }
+
+  .reportSel {
+    width: 80px;
+    margin: 0 10px;
+  }
+  .discussList p {
   width: 100%;
-  display: block;
-}
-
-.clearfix:before,
-.clearfix:after {
-  display: table;
-  content: "";
-}
-
-.clearfix:after {
-  clear: both;
-}
-
-.dkdia .el-dialog--small {
-  width: 40%;
-}
-
-.dateContainer {
-  height: 60px;
-  border: 1px solid black;
-}
-
-.repTitle {
-  font-size: 16px;
-  color: #ccc;
-  font-weight: bold;
-  margin: 10px 0;
-}
-
-.report {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
+  color: #ccc;
   margin: 5px 0;
 }
-
-.report span {
-  display: block;
-  width: 30px;
-  font-size: 16px;
-  text-align: center;
-  margin: 0 5px;
+.discussList .item {
+  margin: 5px;
+  padding: 5px;
+  border-bottom: 1px solid #eee;
 }
 
-.reportInput {
-  width: 70%;
-}
-
-.reportSel {
-  width: 80px;
-  margin: 0 10px;
-}
 </style>

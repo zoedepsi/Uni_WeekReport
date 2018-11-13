@@ -13,8 +13,9 @@
     <div class="bills-wrapper">
       <el-table :data="tableData" stripe style="width: 100%">
         <el-table-column label="时间范围" width='150'>
-          <template  slot-scope="scope">
-            {{getWeekFirstDay(scope.row.createTime)}} <span style="display:block;">至</span> {{getWeekLastDay(scope.row.createTime)}}
+          <template slot-scope="scope">
+            {{getWeekFirstDay(scope.row.createTime)}} <span style="display:block;">至</span>
+            {{getWeekLastDay(scope.row.createTime)}}
           </template>
         </el-table-column>
         <el-table-column label="周报内容">
@@ -26,17 +27,17 @@
                 <span>完成度：{{item.complete}}</span>
               </li>
             </ul>
-            <p  style="color:#888;font-size:12px;">下周工作计划</p>
+            <p style="color:#888;font-size:12px;">下周工作计划</p>
             <ul>
-              <li v-for="(item,index) in scope.row.content.toWork" :key="index"  style="display:flex;justify-content:space-between;padding:0 30px;margin:5px 0;">
+              <li v-for="(item,index) in scope.row.content.toWork" :key="index" style="display:flex;justify-content:space-between;padding:0 30px;margin:5px 0;">
                 <span>{{index+1}}. {{item.content}}</span>
                 <span>完成度：{{item.complete}}</span>
               </li>
             </ul>
-            <!-- <el-button type="primary" size="mini" @click="routerTo(scope.$index, scope.row)">查看</el-button> -->
+            <!-- <el-button type="primary" size="mini" @click="routerTo(scope.$index, scope.row)">评论</el-button> -->
           </template>
         </el-table-column>
-        <el-table-column  label="创建时间" width='200'>
+        <el-table-column label="创建时间" width='200'>
           <template slot-scope="scope">
             <span>{{formatDate(scope.row.createTime)}}</span>
           </template>
@@ -46,14 +47,16 @@
             <span>{{formatDate(scope.row.updateTime)}}</span>
           </template>
         </el-table-column> -->
-        <el-table-column label="操作" width='100'>
+        <el-table-column label="操作" width='150'>
           <template slot-scope="scope">
-          <el-button type="primary" @click="editReport(scope.row.id)" :disabled="scope.row.createTime<getWeekFirstDay(new Date())">编辑</el-button>
+            <el-button type="primary" size='small' @click="editReport(scope.row.id)" :disabled="scope.row.createTime<getWeekFirstDay(new Date())">编辑</el-button>
+            <el-button type="warning" size='small' @click="showDiscuss(scope.row.id)">评论</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    <el-dialog title="填写周报" :visible.sync="dialogVisible" :before-close="clickCancel" :close-on-click-modal=false :close-on-press-escape=false>
+    <el-dialog title="填写周报" :visible.sync="dialogVisible" :before-close="clickCancel" :close-on-click-modal=false
+      :close-on-press-escape=false>
       <div class="formContent">
         <p class="repTitle">本周工作总结</p>
         <div class="report" :key="index" v-for="(item,index) in formData.worked">
@@ -93,12 +96,13 @@
         <el-button type="primary" @click="submitReport">提 交</el-button>
       </span>
     </el-dialog>
-    <el-dialog title="编辑周报" :visible.sync="dialogVisible2" :before-close="clickCancel2"  :close-on-click-modal=false :close-on-press-escape=false>
+    <el-dialog title="编辑周报" :visible.sync="dialogVisible2" :before-close="clickCancel2" :close-on-click-modal=false
+      :close-on-press-escape=false>
       <div class="formContent">
         <p class="repTitle">本周工作总结</p>
         <div class="report" :key="index" v-for="(item,index) in formData.worked">
           <!-- <span>{{item.id}}</span> -->
-          <el-input class="reportInput" v-model="item.content" placeholder="周报内容"  :disabled="item.disableEdit"></el-input>
+          <el-input class="reportInput" v-model="item.content" placeholder="周报内容" :disabled="item.disableEdit"></el-input>
           <el-select class="reportSel" v-model="item.complete" placeholder="完成度">
             <el-option label="0%" value="0%"></el-option>
             <el-option label="20%" value="20%"></el-option>
@@ -133,6 +137,20 @@
         <el-button type="primary" @click="submitEditReport">提 交</el-button>
       </span>
     </el-dialog>
+    <el-dialog title="评论" :visible.sync="dialogVisible3" :before-close="clickCancel3" :close-on-click-modal=false
+      :close-on-press-escape=false>
+      <div class="addDiscuss" style="display:flex;align-items:flex-end;margin-bottom:20px;">
+        <el-input type='textarea' :rows='2' v-model="discussValue"></el-input>
+        <el-button type='primary' size='small' style="margin-left:20px;" @click="submitDiscuss">提交</el-button>
+      </div>
+      <div class="discussList" v-for="(item,index) in discussList" :key="index">
+        <p><span>{{item.truename}}:</span><span>{{formatDate(item.createtime)}}</span></p>
+        <div class="item">{{item.content}}</div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="clickCancel3">关 闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script type='text/ecmascript-6'>
@@ -149,20 +167,26 @@ export default {
       dateValue: "",
       dialogVisible: false,
       dialogVisible2: false,
+      dialogVisible3: false,
+      discussValue: "",
       formData: {
         worked: [],
         toWork: []
       },
       editId: "",
-      noAdd: false
+      noAdd: false,
+      discussId: "",
+      discussList:[]
     };
   },
   mounted() {
     this.refreshData();
   },
   created() {
-    if(!window.sessionStorage.getItem("userId")){
-      this.$router.push({ path: "/login" });
+    if (!window.sessionStorage.getItem("userId")) {
+      this.$router.push({
+        path: "/login"
+      });
     }
   },
   methods: {
@@ -232,6 +256,58 @@ export default {
       } else {
         this.formData.toWork.splice(index, 1);
       }
+    },
+    showDiscuss(id) {
+      this.dialogVisible3 = true;
+      this.discussId = id;
+      this.queryDiscuss();
+    },
+    submitDiscuss() {
+      var that = this;
+      that
+        .axios({
+          method: "post",
+          url: rootPath + "/weeklyserver/report/addReportDiscuss",
+          params: {
+            createdby: window.sessionStorage.getItem("userId"),
+            content: that.discussValue,
+            relateid: that.discussId
+          }
+        })
+        .then(response => {
+          that.$message({
+            message: "添加成功",
+            type: "success"
+          });
+          that.queryDiscuss();
+          that.discussValue = "";
+        })
+        .catch(res => {
+          that.$message({
+            message: response.data.msg,
+            type: "warrning"
+          });
+        });
+    },
+    queryDiscuss() {
+      var that = this;
+      that
+        .axios({
+          method: "post",
+          url: rootPath + "/weeklyserver/report/queryDiscuss",
+          params: {
+            relateid: that.discussId
+          }
+        })
+        .then(response => {
+          that.discussList = response.data.data;
+        })
+        .catch(res => {
+          that.$message({
+            message: response.data.msg,
+            type: "warrning"
+          });
+        });
     },
     submitReport() {
       var that = this;
@@ -336,6 +412,9 @@ export default {
 
     clickCancel2() {
       this.dialogVisible2 = false;
+    },
+    clickCancel3() {
+      this.dialogVisible3 = false;
     },
 
     addReport() {
@@ -531,5 +610,17 @@ export default {
 .reportSel {
   width: 80px;
   margin: 0 10px;
+}
+.discussList p {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  color: #ccc;
+  margin: 5px 0;
+}
+.discussList .item {
+  margin: 5px;
+  padding: 5px;
+  border-bottom: 1px solid #eee;
 }
 </style>
