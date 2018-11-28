@@ -39,8 +39,7 @@
           <div class="content-panel-title">上周周报条数</div>
           <div class="content-panel-value total-color">{{datas2.totalCount}}<span>条</span></div>
           <div class="content-panel-detail">
-            <!-- <span>在线支付 0.00元</span> -->
-            <!-- &nbsp;&nbsp;<span>货到付款 0.00元</span> -->
+            <span @click="dialogVisible=true">上周未写周报人员</span>
           </div>
         </div>
         <div class="content-panel-border"></div>
@@ -64,7 +63,14 @@
         </div>
       </div>
     </div>
-    
+        <el-dialog title="详情" :visible.sync="dialogVisible" custom-class='detail_dialog' top="1%">
+          <div>
+            <span v-for="item in userNoreport" :key="item" style="padding:20px;">{{item}}</span>
+          </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">关 闭</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -76,12 +82,15 @@
     data() {
       return {
         datas: "",
-        datas2: ""
+        datas2: "",
+        userNoreport:'',
+        dialogVisible:false
       };
     },
     mounted() {
       this.queryCount();
       this.queryCount2();
+      this.getNorecord();
     },
   created() {
     if(!window.sessionStorage.getItem("userId")){
@@ -89,6 +98,27 @@
     }
   },
     methods: {
+      getNorecord(){
+        var that = this;
+        this.axios({
+          method: "get",
+          url: rootPath + "/weeklyserver/report/getUserNoReport"
+        }).then(response => {
+          if (response.data.code == "00000") {
+            that.userNoreport = response.data.data;
+          } else if (response.data == undefined) {
+            this.$message({
+              message: "系统请求发生错误",
+              type: "error"
+            });
+          } else {
+            this.$message({
+              message: response.data.msg,
+              type: "error"
+            });
+          }
+        });
+      },
       queryCount() {
         var that = this;
         this.axios({
