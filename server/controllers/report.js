@@ -122,8 +122,8 @@ async function getUserNoReport(ctx) {
  * @param {*} content
  */
 async function addReports(ctx) {
-    const userId = ctx.query.userId;
-    const content = ctx.query.content;
+    const userId = ctx.request.body.userId;
+    const content = JSON.stringify(ctx.request.body.content);
     await DB.insert({
         'content': content,
         'userId': userId

@@ -19,7 +19,7 @@ function getWeekLastDay(day) {
 }
 
 async function add(ctx) {
-    const query = JSON.parse(ctx.query.formData);
+    const query = JSON.parse(ctx.request.body.formData);
     const title = query.title,
         hoster = query.hoster,
         recorder = query.recorder,
