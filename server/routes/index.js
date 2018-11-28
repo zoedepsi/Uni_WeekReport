@@ -26,6 +26,7 @@ router.post('/report/getLastWeekReport', controllers.report.getLastWeekReport)
 router.get('/report/queryCount', controllers.report.queryCount)
 router.post('/report/addReportDiscuss', controllers.report.addReportDiscuss)
 router.post('/report/queryDiscuss', controllers.report.queryDiscuss)
+router.get('/report/getUserNoReport',controllers.report.getUserNoReport)
 
 //会议纪要接口
 router.post('/meet/add', controllers.meet.add)

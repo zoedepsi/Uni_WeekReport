@@ -63,7 +63,7 @@ async function getLastWeekReport(ctx) {
 
 async function getReportById(ctx) {
     const id = ctx.query.id;
-    await DB.select('*').from('report').where('id', id).then(res => {
+    await DB.select('*').from('report').where('id', id).orderBy('createTime', 'desc').then(res => {
         ctx.state.data = res;
     })
 }
@@ -81,7 +81,7 @@ async function getReportsByGroup(ctx) {
     await DB.select('id', 'truename').from('user').where('groupid', groupId).then(async res => {
         var userArr = res;
         for (var i = 0; i < userArr.length; i++) {
-            await DB.select('*').from('report').where('userId', userArr[i].id).andWhere('createTime', '>=', startTime).andWhere('createTime', '<=', endTime).then(res => {
+            await DB.select('*').from('report').where('userId', userArr[i].id).andWhere('createTime', '>=', startTime).andWhere('createTime', '<=', endTime).orderBy('createTime', 'desc').then(res => {
                 if (res.length > 0) {
                     data[userArr[i].truename] = res;
                 }
@@ -89,6 +89,27 @@ async function getReportsByGroup(ctx) {
         }
     })
 
+    ctx.state.data = data;
+}
+
+async function getUserNoReport(ctx) {
+    var date = new Date();
+    var firstDay = getWeekFirstDay(date);
+    const lastWeekfirstDay = getLastWeekFirstDay(new Date(firstDay));
+    const lastWeeklastDay = getLastWeekLastDay(new Date(firstDay));
+    const startTime = lastWeekfirstDay;
+    const endTime = lastWeeklastDay;
+    var data = [];
+    await DB.select('id', 'truename').from('user').then(async res => {
+        var userArr = res;
+        for (var i in userArr) {
+            await DB.select("id").from('report').where('userId', userArr[i].id).andWhere('createTime', '>=', startTime).andWhere('createTime', '<=', endTime).then(res => {
+                if (res.length == 0&&userArr[i].id!='9'&&userArr[i].id!='1') {
+                    data.push(userArr[i].truename);
+                }
+            })
+        }
+    })
     ctx.state.data = data;
 }
 
@@ -158,11 +179,11 @@ async function addReportDiscuss(ctx) {
 
 async function queryDiscuss(ctx) {
     var id = ctx.query.relateid;
-    await DB.select('reportDiscuss.content','user.truename','reportDiscuss.createtime').from('reportDiscuss').innerJoin('report', function () {
+    await DB.select('reportDiscuss.content', 'user.truename', 'reportDiscuss.createtime').from('reportDiscuss').innerJoin('report', function () {
         this.on('reportDiscuss.relateid', '=', 'report.id')
     }).innerJoin('user', function () {
         this.on('user.id', '=', 'reportDiscuss.createdby')
-    }).where('reportDiscuss.relateid', id).orderBy('createtime','desc').then(res => {
+    }).where('reportDiscuss.relateid', id).orderBy('createtime', 'desc').then(res => {
         ctx.state.data = res;
     })
 }
@@ -176,5 +197,6 @@ module.exports = {
     getLastWeekReport,
     queryCount,
     addReportDiscuss,
-    queryDiscuss
+    queryDiscuss,
+    getUserNoReport
 }
