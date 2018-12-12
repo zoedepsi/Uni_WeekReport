@@ -334,7 +334,7 @@ export default {
         .axios({
           method: "post",
           url: rootPath + "/weeklyserver/report/add",
-          params: {
+          data: {
             userId: window.sessionStorage.getItem("userId"),
             content: that.formData
           }
