@@ -150,7 +150,7 @@ export default {
             .axios({
               method: "post",
               url: rootPath + "/weeklyserver/meet/add",
-              params: {
+              data: {
                 formData: JSON.stringify(that.formData)
               }
             })
