@@ -15,6 +15,7 @@ module.exports = async function (ctx, next) {
         ctx.body = ctx.body ? ctx.body : {
             code: ctx.state.code !== undefined ? ctx.state.code : '00000',
             data: ctx.state.data !== undefined ? ctx.state.data : {},
+            count:ctx.state.count !== undefined ? ctx.state.count : 0,
             msg: ctx.state.msg !== undefined ? ctx.state.msg : ''
 
         }

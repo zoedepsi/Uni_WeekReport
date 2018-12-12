@@ -5,16 +5,25 @@
         <div class="page-title" id="vip-title">会议纪要查询</div>
       </el-col>
       <el-col :span="18">
-            <el-button type="primary" style="float:right;margin:0 5px;" @click="refreshData">检索</el-button>
-            <el-input v-model="title" placeholder="输入会议主题" style="width:200px;float:right;margin:0 5px;"></el-input>
-            <el-select style="float:right;" v-model="meettype" placeholder="会议类别" @change="refreshData">
-              <el-option label="全部类别" value="0"></el-option>
-              <el-option label="部门周例会" value="部门周例会"></el-option>
-              <el-option label="团队周例会" value="团队周例会"></el-option>
-              <el-option label="需求讨论会" value="需求讨论会"></el-option>
-              <el-option label="研发讨论会" value="研发讨论会"></el-option>
-              <el-option label="其他" value="其他"></el-option>
-            </el-select>
+        <el-button type="primary" style="float:right;margin:0 5px;" @click="refreshData">检索</el-button>
+        <el-input
+          v-model="hoster"
+          placeholder="主持人或记录人"
+          style="width:150px;float:right;margin:0 5px;"
+        ></el-input>
+        <el-input
+          v-model="title"
+          placeholder="输入会议主题"
+          style="width:200px;float:right;margin:0 5px;"
+        ></el-input>
+        <el-select style="float:right;" v-model="meettype" placeholder="会议类别" @change="refreshData">
+          <el-option label="全部类别" value="0"></el-option>
+          <el-option label="部门周例会" value="部门周例会"></el-option>
+          <el-option label="团队周例会" value="团队周例会"></el-option>
+          <el-option label="需求讨论会" value="需求讨论会"></el-option>
+          <el-option label="研发讨论会" value="研发讨论会"></el-option>
+          <el-option label="其他" value="其他"></el-option>
+        </el-select>
       </el-col>
     </el-row>
     <div class="bills-wrapper">
@@ -35,13 +44,14 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-button type="primary" style="width:300px;display:block;margin:10px auto;" @click="lookMore" v-loading="loading" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">查看更多</el-button>
     </div>
-    <el-dialog title="纪要详情" :visible.sync="dialogVisible" custom-class='detail_dialog' top="1%">
+    <el-dialog title="纪要详情" :visible.sync="dialogVisible" custom-class="detail_dialog" top="1%">
       <el-form class="meetForm" :model="dialogData" label-width="100px">
         <el-form-item label="会议主题:" prop="title">
           <span>{{dialogData.title}}</span>
         </el-form-item>
-                <el-form-item label="会议类别:" prop="title">
+        <el-form-item label="会议类别:" prop="title">
           <span>{{dialogData.meettype}}</span>
         </el-form-item>
         <el-form-item label="主持人:" prop="hoster">
@@ -57,16 +67,19 @@
           <span>{{formatDate(dialogData.createtime)}}</span>
         </el-form-item>
         <el-form-item label="会议内容:" prop="content">
-          <div v-html='dialogData.content'></div>
+          <div v-html="dialogData.content"></div>
         </el-form-item>
       </el-form>
       <div style="display:flex;align-items:flex-end;margin-bottom:10px;">
-      <el-input v-model="discuss" placeholder="" type="textarea" :rows='2'></el-input>
-<el-button size="small" style="margin-left:10px;" type="primary" @click="addDiscuss">评论</el-button>
+        <el-input v-model="discuss" placeholder type="textarea" :rows="2"></el-input>
+        <el-button size="small" style="margin-left:10px;" type="primary" @click="addDiscuss">评论</el-button>
       </div>
 
       <div class="discussList" v-for="(item,index) in discussList" :key="index">
-        <p><span>{{item.truename}}:</span><span>{{formatDate(item.createtime)}}</span></p>
+        <p>
+          <span>{{item.truename}}:</span>
+          <span>{{formatDate(item.createtime)}}</span>
+        </p>
         <div class="item">{{item.content}}</div>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -86,9 +99,13 @@ export default {
       dialogData: "",
       meettype: "",
       title: "",
+      hoster: "",
+      total:0,
       discuss: "",
       rightId: "",
-      discussList: []
+      pageNo:1,
+      discussList: [],
+      loading:false
     };
   },
   mounted() {
@@ -116,11 +133,19 @@ export default {
           params: {
             userId: window.sessionStorage.getItem("userId"),
             meettype: that.meettype,
-            title: that.title
+            title: that.title,
+            hoster: that.hoster,
+            pageNo:that.pageNo
           }
         })
         .then(response => {
+          if(that.total==response.data.count){
+            that.$message.warning("没有更多啦");
+          }
           that.tableData = response.data.data;
+          that.total=response.data.count;
+          that.loading=false;
+          
         })
         .catch(res => {
           that.$message({
@@ -128,6 +153,11 @@ export default {
             type: "warrning"
           });
         });
+    },
+    lookMore(){
+      this.loading=true;
+      this.pageNo++;
+      this.refreshData();
     },
     lookDetail(row) {
       this.dialogData = row;

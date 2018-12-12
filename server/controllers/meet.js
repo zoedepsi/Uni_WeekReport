@@ -45,50 +45,48 @@ async function add(ctx) {
 }
 async function query(ctx) {
     const query = ctx.query;
-    const id = query.id;
     const userid = query.userId;
     const meettype = query.meettype;
     const title = '%' + query.title + '%';
-    if (id) {
-        await DB.select('*').from('meetrecord').where('meetrecord.id', id).andWhere('title', 'like', title).then(res => {
-            ctx.state.data = res;
+    const hoster = '%' + query.hoster + '%';
+    const pageNo=query.pageNo*15;
+
+    if (!meettype||meettype=='0') {
+        await DB.select('*').from('meetrecord').where('title', 'like', title).andWhere('hostmemberid','like',hoster).orWhere('recordmemberid','like',hoster).orderBy('createtime', 'desc').limit(pageNo).then(res => {
+            var arr = [];
+            for (var i in res) {
+                if (res[i].visiable == '1') {
+                    if (res[i].userid == userid) {
+                        arr.push(res[i]);
+                    }
+                } else if (res[i].visiable == '2') {
+                    //仅参会人可见                    
+                } else {
+                    arr.push(res[i])
+                }
+            }
+            ctx.state.data = arr;
+            ctx.state.count=arr.length;
         })
     } else {
-        if (meettype == '' || !meettype || meettype == '0') {
-            await DB.select('*').from('meetrecord').where('title', 'like', title).orderBy('createtime', 'desc').then(res => {
-                var arr = [];
-                for (var i in res) {
-                    if (res[i].visiable == '1') {
-                        if (res[i].userid == userid) {
-                            arr.push(res[i]);
-                        }
-                    } else if (res[i].visiable == '2') {
-                        //仅参会人可见                    
-                    } else {
-                        arr.push(res[i])
+        await DB.select('*').from('meetrecord').where('meettype', meettype).andWhere('title', 'like', title).andWhere('hostmemberid','like',hoster).orWhere('recordmemberid','like',hoster).orderBy('createtime', 'desc').limit(pageNo).then(res => {
+            var arr = [];
+            for (var i in res) {
+                if (res[i].visiable == '1') {
+                    if (res[i].userid == userid) {
+                        arr.push(res[i]);
                     }
+                } else if (res[i].visiable == '2') {
+                    //仅参会人可见                    
+                } else {
+                    arr.push(res[i])
                 }
-                ctx.state.data = arr;
-            })
-        } else {
-            await DB.select('*').from('meetrecord').where('meettype', meettype).andWhere('title', 'like', title).orderBy('createtime', 'desc').then(res => {
-                var arr = [];
-                for (var i in res) {
-                    if (res[i].visiable == '1') {
-                        if (res[i].userid == userid) {
-                            arr.push(res[i]);
-                        }
-                    } else if (res[i].visiable == '2') {
-                        //仅参会人可见                    
-                    } else {
-                        arr.push(res[i])
-                    }
-                }
-                ctx.state.data = arr;
-            })
-        }
-
+            }
+            ctx.state.list = arr;
+            ctx.state.count=arr.length;
+        })
     }
+
 }
 
 async function queryCount(ctx) {
@@ -121,11 +119,11 @@ async function addMeetDiscuss(ctx) {
 
 async function queryDiscuss(ctx) {
     var id = ctx.query.relateid;
-    await DB.select('meetdiscuss.content','user.truename','meetdiscuss.createtime').from('meetdiscuss').innerJoin('meetrecord', function () {
+    await DB.select('meetdiscuss.content', 'user.truename', 'meetdiscuss.createtime').from('meetdiscuss').innerJoin('meetrecord', function () {
         this.on('meetdiscuss.relateid', '=', 'meetrecord.id')
     }).innerJoin('user', function () {
         this.on('user.id', '=', 'meetdiscuss.createdby')
-    }).where('meetdiscuss.relateid', id).orderBy('createtime','desc').then(res => {
+    }).where('meetdiscuss.relateid', id).orderBy('createtime', 'desc').then(res => {
         ctx.state.data = res;
     })
 }
