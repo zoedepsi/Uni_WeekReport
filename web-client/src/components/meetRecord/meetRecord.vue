@@ -8,7 +8,7 @@
     <div class="bills-wrapper">
       <el-form class="meetForm" ref="formData" :rules="rules" :model="formData" label-width="100px">
         <el-form-item label="会议主题" prop="title">
-          <el-input v-model="formData.title"  style="width:500px"></el-input>
+          <el-input v-model="formData.title"  style="width:80%"></el-input>
         </el-form-item>
         <el-form-item label="会议类别" prop="meettype">
             <el-select v-model="formData.meettype" placeholder="请选择会议类别">
@@ -40,7 +40,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="会议内容" prop="content">
-          <div class="edit_container"  style="width:500px">
+          <div class="edit_container"  style="width:80%">
             <editor class="editor" :value="formData.content" :setting="editorSetting" @input="(content)=> formData.content = content"></editor>
           </div>
         </el-form-item>
@@ -260,7 +260,7 @@ export default {
 }
 
 .meetForm {
-  width: 600px;
+  width: 70%;
   margin: 0 auto;
   border: 1px solid #ccc;
   padding: 20px;

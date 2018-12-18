@@ -52,7 +52,7 @@ async function query(ctx) {
     const pageNo=query.pageNo*15;
 
     if (!meettype||meettype=='0') {
-        await DB.select('*').from('meetrecord').where('title', 'like', title).andWhere('hostmemberid','like',hoster).orWhere('recordmemberid','like',hoster).orderBy('createtime', 'desc').limit(pageNo).then(res => {
+        await DB.select('*').from('meetrecord').where('title', 'like', title).andWhere('hostmemberid','like',hoster).orderBy('createtime', 'desc').limit(pageNo).then(res => {
             var arr = [];
             for (var i in res) {
                 if (res[i].visiable == '1') {
@@ -69,7 +69,7 @@ async function query(ctx) {
             ctx.state.count=arr.length;
         })
     } else {
-        await DB.select('*').from('meetrecord').where('meettype', meettype).andWhere('title', 'like', title).andWhere('hostmemberid','like',hoster).orWhere('recordmemberid','like',hoster).orderBy('createtime', 'desc').limit(pageNo).then(res => {
+        await DB.select('*').from('meetrecord').where('meettype', meettype).andWhere('title', 'like', title).andWhere('hostmemberid','like',hoster).orderBy('createtime', 'desc').limit(pageNo).then(res => {
             var arr = [];
             for (var i in res) {
                 if (res[i].visiable == '1') {
@@ -82,7 +82,7 @@ async function query(ctx) {
                     arr.push(res[i])
                 }
             }
-            ctx.state.list = arr;
+            ctx.state.data = arr;
             ctx.state.count=arr.length;
         })
     }

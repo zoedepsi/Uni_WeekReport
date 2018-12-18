@@ -46,12 +46,12 @@
       </el-table>
       <el-button type="primary" style="width:300px;display:block;margin:10px auto;" @click="lookMore" v-loading="loading" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)">查看更多</el-button>
     </div>
-    <el-dialog title="纪要详情" :visible.sync="dialogVisible" custom-class="detail_dialog" top="1%">
-      <el-form class="meetForm" :model="dialogData" label-width="100px">
-        <el-form-item label="会议主题:" prop="title">
+    <el-dialog title="纪要详情" class="detailDialog" :visible.sync="dialogVisible" custom-class="detail_dialog" top="1%" fullscreen>
+      <el-form class="meetForm" :model="dialogData" label-width="60px">
+        <el-form-item label="主题:" prop="title">
           <span>{{dialogData.title}}</span>
         </el-form-item>
-        <el-form-item label="会议类别:" prop="title">
+        <el-form-item label="类别:" prop="title">
           <span>{{dialogData.meettype}}</span>
         </el-form-item>
         <el-form-item label="主持人:" prop="hoster">
@@ -63,10 +63,10 @@
         <el-form-item label="参会人:" prop="persons">
           <p>{{dialogData.members}}</p>
         </el-form-item>
-        <el-form-item label="会议时间:" prop="time">
+        <el-form-item label="时间:" prop="time">
           <span>{{formatDate(dialogData.createtime)}}</span>
         </el-form-item>
-        <el-form-item label="会议内容:" prop="content">
+        <el-form-item label="内容:" prop="content">
           <div v-html="dialogData.content"></div>
         </el-form-item>
       </el-form>
@@ -225,9 +225,6 @@ export default {
   margin-top: 9px;
 }
 
-.el-dialog--small {
-  width: 400px !important;
-}
 
 #vip-title {
   margin-bottom: 0;
@@ -276,6 +273,7 @@ export default {
 .detail_dialog {
   height: 400px;
   overflow-y: scroll;
+  width: 70%;
 }
 .discussList p {
   width: 100%;
