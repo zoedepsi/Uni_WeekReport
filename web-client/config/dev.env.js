@@ -3,6 +3,6 @@ var prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
     NODE_ENV: '"development"',
-    API_ROOT: '"http://127.0.0.1:3000"'
+    API_ROOT: '"http://smartair.haier.net"'
 
 })

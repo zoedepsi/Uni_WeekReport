@@ -71,6 +71,7 @@
         <el-button type="primary" @click="dialogVisible = false">关 闭</el-button>
       </span>
     </el-dialog>
+    <p class="link"><a href="http://haiershequ.com:8000/d/b164767a782b43fab335/" target="_blank">系统管理规范</a></p>
   </div>
 </template>
 
@@ -245,6 +246,13 @@
     right: 1px;
     top: 30px;
     position: absolute;
+  }
+  .link{
+    text-align: center;
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
   }
 
 </style>

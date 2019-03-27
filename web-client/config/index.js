@@ -30,7 +30,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/weeklyserver': {
-        target: 'http://10.159.174.194:3000/weeklyserver',
+        target: 'http://smartair.haier.net/weeklyserver',
         changeOrigin: true,
         pathRewrite: {
           '^/weeklyserver': '/weeklyserver'
