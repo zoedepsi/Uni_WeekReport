@@ -8,7 +8,7 @@
         <el-button type="primary" style="float:right;margin:0 5px;" @click="refreshData">检索</el-button>
         <el-input
           v-model="hoster"
-          placeholder="主持人或记录人"
+          placeholder="主持人"
           style="width:150px;float:right;margin:0 5px;"
         ></el-input>
         <el-input
